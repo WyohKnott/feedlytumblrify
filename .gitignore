@@ -1,0 +1,7 @@
+*.bak
+*.pem
+*Thumbs.db
+.DS_Store
+
+/build
+/node_modules

@@ -1,0 +1,30 @@
+{
+  "name": "feedlytumblrify",
+  "description": "Like and reblog from Feedly",
+  "homepage": "https://github.com/wyohknott/feedlytumblrify#readme",
+  "version": "0.3.0",
+  "author": "wyohknott",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wyohknott/feedlytumblrify/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wyohknott/feedlytumblrify.git"
+  },
+  "keywords": [
+    "feedly",
+    "tumblr",
+    "reblog",
+    "blog"
+  ],
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.0.3",
+    "gulp-htmlclean": "^2.7.6",
+    "gulp-jshint": "^2.0.0",
+    "gulp-zip": "^3.2.0",
+    "jshint": "^2.9.1"
+  }
+}

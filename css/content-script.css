@@ -1,0 +1,261 @@
+.u4Entry.tumblrify,
+.u5Entry.tumblrify,
+.u100Frame.tumblrify,
+.u100Entry.tumblrify {
+    position: relative;
+}
+
+/*
+ * Like and reblog buttons
+ */
+
+.buttonsContainer {
+    position: absolute;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+.u4Entry .buttonsContainer {
+    position: absolute;
+    top: initial;
+    right: 10px;
+    left: initial;
+    bottom: 10px;
+}
+.u5Entry .buttonsContainer {
+    position: absolute;
+    top: initial;
+    right: initial;
+    left: 10px;
+    bottom: 10px;
+}
+.u100Frame .buttonsContainer {
+    position: absolute;
+    top: initial;
+    right: 80px;
+    left: initial;
+    bottom: 182px;
+}
+.u100Entry .buttonsContainer {
+    position: absolute;
+    top: 130px;
+    right: 40px;
+    left: initial;
+    bottom: initial;
+    z-index: 99;
+}
+.buttonsContainer > i {
+    padding: 0.2em;
+}
+.buttonsContainer .ic-like.liked {
+    color: #d95e40;
+}
+.buttonsContainer .ic-reblog.reblogged {
+    color: #56bc8a;
+}
+/*
+ *  Reblog popup
+ */
+
+.popupContainer {
+    background: #fff;
+    display: none;
+    top: 45px;
+    left: -18px;
+    position: absolute;
+    z-index: 1001;
+}
+.u100Frame .popupContainer,
+.u100Entry .popupContainer {
+    right: -50px;
+    left: initial;
+}
+.popupWrapper {
+    align-items: stretch;
+    background: #fff;
+    border-color: #529ecc;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 2px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 20rem;
+    min-width: 20rem;
+    overflow: auto;
+    padding: 1px;
+    resize: both;
+    width: 20rem;
+}
+.arrow {
+    height: 1px;
+    margin-bottom: -3px;
+    position: relative;
+    width: 20rem;
+}
+.arrow:after,
+.arrow:before {
+    bottom: 100%;
+    left: 20%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.u100Frame .arrow:after,
+.u100Frame .arrow:before,
+.u100Entry .arrow:after,
+.u100Entry .arrow:before {
+    left: 80%;
+}
+.arrow:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #fff;
+    border-width: 20px;
+    margin-left: -20px;
+}
+.arrow:before {
+    border-color: rgba(82, 158, 204, 0);
+    border-bottom-color: #529ecc;
+    border-width: 22px;
+    margin-left: -22px;
+}
+.popupWrapper > * {
+    box-sizing: border-box;
+}
+.popupWrapper .commentArea {
+    flex: 1 0 10rem;
+}
+.popupWrapper input,
+.popupWrapper .commentArea,
+.popupWrapper select,
+.popupWrapper label {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    color: #444;
+    font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    outline: 0;
+    padding: 6px 9px;
+}
+.popupWrapper label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.popupWrapper label > input {
+    margin-right: 0.5em;
+}
+.popupWrapper button {
+    background: #9da6af;
+    border-color: #9da6af;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    height: 30px;
+    line-height: 20px;
+    margin: 1px;
+    padding: 4px 7px 5px;
+    text-decoration: none;
+}
+.popupWrapper *:focus,
+.popupWrapper *:active {
+    outline: 0;
+    outline-style: none;
+    outline-width: 0;
+    -moz-outline-width: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+.popupWrapper button:active {
+    background-color: #929ca6;
+    border-color: #929ca6;
+    color: rgba(255, 255, 255, .8);
+}
+.popupWrapper button:focus {
+    background-color: #97a1aa;
+    border-color: #97a1aa;
+    color: rgba(255, 255, 255, .9);
+}
+.popupWrapper button.blue {
+    background: #529ecc;
+    border-color: #529ecc;
+}
+.popupWrapper button.blue:active {
+    background-color: #4295c7;
+    border-color: #4295c7;
+    color: rgba(255, 255, 255, .8);
+}
+.popupWrapper button.blue:focus {
+    background-color: #4a9aca;
+    border-color: #4a9aca;
+    color: rgba(255, 255, 255, .9);
+}
+.buttonsGroup {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.buttonsGroup > button {
+    flex-grow: 1;
+    font: normal normal normal 14px/1 'icons';
+    font-size: inherit;
+    height: 35px;
+    text-rendering: auto;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+/*
+ *  https://design.google.com/icons/ by Google - https://design.google.com/icons/
+ *  CreativeCommons Attribution 4.0 (CC BY 4.0)
+ *  https://creativecommons.org/licenses/by/4.0/
+ */
+
+@font-face {
+    font-family: 'icons';
+    src: url('chrome-extension://__MSG_@@extension_id__/assets/icons.woff2') format('woff2'),
+         url('../assets/icons.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+.ic-queue:before {
+    content: "\e8b5";
+}
+.ic-edit:before {
+    content: "\e254";
+}
+.ic-like:before {
+    content: "\e87d";
+}
+.ic-draft:before {
+    content: "\e882";
+}
+.ic-reblog:before {
+    content: "\e040";
+}
+.ic-reblogged:before {
+    content: "\e041";
+}
+.ic {
+    display: inline-block;
+    font: normal normal normal 14px/1 'icons';
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.ic-lg {
+    font-size: 1.33333333em;
+    line-height: 0.75em;
+    vertical-align: -15%;
+}
