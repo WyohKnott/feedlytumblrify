@@ -345,7 +345,7 @@
             destroy: function () {
                 let parentEl = this.buttonsContainer.parentElement;
                 parentEl.removeChild(this.buttonsContainer);
-                parentEl.classList.remove('tumblrify');
+                parentEl.closest('.tumblrify').classList.remove('tumblrify');
                 delete this.buttonsContainer;
                 delete this.postData;
                 delete this.popupContainer;
@@ -401,11 +401,13 @@
                 return;
             }
             getPost(blogName, id).then(function (data) {
-                /*let parentEl = '';
-                if (itm.classList.contains('u100Frame') {
-                    parentEl
-                }*/
-                buttonsArray.push(new tumblrifyButtons(itm, data));
+                let parentEl = '';
+                if (itm.classList.contains('u100Entry') || itm.classList.contains('u100Frame')) {
+                    parentEl = itm.querySelector('.headerInfo.headerInfo-article');
+                } else {
+                    parentEl = itm;
+                }
+                buttonsArray.push(new tumblrifyButtons(parentEl, data));
             });
         });
     }

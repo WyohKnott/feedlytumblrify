@@ -1,7 +1,5 @@
 .u4Entry.tumblrify,
-.u5Entry.tumblrify,
-.u100Frame.tumblrify,
-.u100Entry.tumblrify {
+.u5Entry.tumblrify {
     position: relative;
 }
 
@@ -17,34 +15,31 @@
 .u4Entry .buttonsContainer {
     position: absolute;
     top: initial;
-    right: 10px;
+    right: 0;
     left: initial;
-    bottom: 10px;
+    bottom: 0;
 }
 .u5Entry .buttonsContainer {
     position: absolute;
+    top: 0;
+    left: initial;
+    right: 0;
+    bottom: initial;
+    text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white;
+}
+
+.u100Frame .buttonsContainer,
+.u100Entry .buttonsContainer {
+    float: left;
+    position: relative;
+    margin-top: 9px;
     top: initial;
     right: initial;
-    left: 10px;
-    bottom: 10px;
-}
-.u100Frame .buttonsContainer {
-    position: absolute;
-    top: initial;
-    right: 80px;
-    left: initial;
-    bottom: 182px;
-}
-.u100Entry .buttonsContainer {
-    position: absolute;
-    top: 130px;
-    right: 40px;
     left: initial;
     bottom: initial;
-    z-index: 99;
 }
 .buttonsContainer > i {
-    padding: 0.2em;
+    padding: 8px;
 }
 .buttonsContainer .ic-like.liked {
     color: #d95e40;
@@ -59,14 +54,15 @@
 .popupContainer {
     background: #fff;
     display: none;
-    top: 45px;
-    left: -18px;
+    top: 50px;
+    left: -7px;
     position: absolute;
     z-index: 1001;
 }
+.u4Entry .popupContainer,
 .u100Frame .popupContainer,
 .u100Entry .popupContainer {
-    right: -50px;
+    right: -46px;
     left: initial;
 }
 .popupWrapper {
@@ -104,6 +100,8 @@
     position: absolute;
     pointer-events: none;
 }
+.u4Entry .arrow:after,
+.u4Entry .arrow:before,
 .u100Frame .arrow:after,
 .u100Frame .arrow:before,
 .u100Entry .arrow:after,
