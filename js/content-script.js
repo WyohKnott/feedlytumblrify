@@ -222,7 +222,9 @@
                         /\r\n|\r|\n/g, '<br />'),
                     tags = this.popupContainer.querySelector('[name=tags]').value.trim().replace(
                         /-/g, ' '),
-                    attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked;
+                    attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked,
+                    buttonsGroup = this.popupContainer.querySelector('.buttonsGroup');
+                Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = true);
                 return tumblrClient.request('https://api.tumblr.com/v2/blog/' + blog_identifier +
                     '/post/reblog', {
                         method: 'POST',
@@ -240,7 +242,7 @@
                     if (err.status === 401) {
                         getStatus().then((status) => update(status));
                     }
-                });
+                }).finally(() => Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false));
             },
 
             keyHandler: function (event) {
@@ -337,6 +339,8 @@
                     this.postData);
                 if (this.popup.popupContainer.style.display !== 'block') {
                     this.popup.popupContainer.style.display = 'block';
+                    let buttonsGroup = this.popup.popupContainer.querySelector('.buttonsGroup');
+                    Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
                 } else {
                     this.popup.close();
                 }
