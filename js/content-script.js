@@ -242,11 +242,11 @@
                     if (err.status === 401) {
                         getStatus().then((status) => update(status));
                     }
-                }).finally(() => Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false));
+                });
             },
 
             keyHandler: function (event) {
-                e.stopPropagation();
+                event.stopPropagation();
                 if (event.keyCode === 27) {
                     this.close();
                 }
@@ -374,14 +374,8 @@
                     tags: data.response.posts[0].tags
                 };
             } else {
-                throw new Error('no post found');
+                throw new Error({status: 404, statusTest: 'No post returned'});
             }
-        }).catch(function (err) {
-            console.warn('Error while fetching post', blogName, id, err);
-            if (err.status === 401) {
-                getStatus().then((status) => update(status));
-            }
-            throw err;
         });
     }
 
@@ -413,6 +407,11 @@
                     parentEl = itm;
                 }
                 buttonsArray.push(new tumblrifyButtons(parentEl, data));
+            }).catch(function (err) {
+                console.log('Error while fetching post', blogName, id, err.statusText);
+                if (err.status === 401) {
+                    getStatus().then((status) => update(status));
+                }
             });
         });
         /*

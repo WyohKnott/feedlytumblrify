@@ -1,5 +1,5 @@
 /* jshint esversion: 6 */
-(function () {    
+(function () {
     "use strict";
 
     var loginButton = document.getElementById('login'),
@@ -9,7 +9,7 @@
         statusText = document.getElementById('status'),
         accountText = document.getElementById('account'),
         avatar = document.getElementById('statusWrap'),
-        callbackRegex = new RegExp('^https://localhost/redirectpage.*$', 'i');  
+        callbackRegex = new RegExp('^https://localhost/redirectpage.*$', 'i');
 
     // Oauth connection logic
     // Step 1
@@ -20,7 +20,7 @@
             consumerSecret: consumerSecretInput.value
         };
         if (!tokens.consumerKey || !tokens.consumerSecret) {
-            console.warn('Missing consumerKey and consumerSecret');
+            console.log('Missing consumerKey and consumerSecret');
             return;
         }
         config = Object.assign(tokens, tumblrEndpoints);

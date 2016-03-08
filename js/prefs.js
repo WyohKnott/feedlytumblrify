@@ -80,7 +80,7 @@ var logout = function () {
         accessTokenSecret: ''
     };
     tumblrClient = {};
-    getPrefs('tumblrTokens').then(function (response) {
+    return getPrefs('tumblrTokens').then(function (response) {
         currentPrefs = response.tumblrTokens || currentPrefs;
         return currentPrefs;
     }).then(function (prefs) {
