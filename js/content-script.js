@@ -171,7 +171,6 @@
                 commentArea.addEventListener('input', (e) => e.stopPropagation(), false);
                 commentArea.addEventListener('keypress', (e) => e.stopPropagation(), false);
                 commentArea.addEventListener('keyup', (e) => e.stopPropagation(), false);
-                commentArea.addEventListener('keydown', (e) => e.stopPropagation(), false);
 
                 this.popupContainer.appendChild(arrowDiv);
                 this.popupContainer.appendChild(popupWrapper);
@@ -245,6 +244,7 @@
             },
 
             keyHandler: function (event) {
+                e.stopPropagation();
                 if (event.keyCode === 27) {
                     this.close();
                 }
@@ -443,6 +443,16 @@
             }
         }
     }
+
+    //onpopstate doesn't seem to work
+    var cleanupInterval = window.setInterval(function () {
+        buttonsArray.forEach(function (el, index, arr) {
+            if (el instanceof tumblrifyButtons && el.buttonsContainer.parentElement === null) {
+                el.destroy();
+                delete arr[index];
+            }
+        });
+    }, 120000);
 
     chrome.storage.onChanged.addListener(() => getStatus()
         .then((status) => update(status))

@@ -2,9 +2,9 @@
   "name": "feedlytumblrify",
   "description": "Like and reblog from Feedly",
   "homepage": "https://github.com/wyohknott/feedlytumblrify#readme",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "author": "wyohknott",
-  "license": "MIT",
+  "license": "BSD",
   "bugs": {
     "url": "https://github.com/wyohknott/feedlytumblrify/issues"
   },
