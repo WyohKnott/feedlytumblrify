@@ -381,7 +381,7 @@
         });
     }
 
-    function processPage() {
+    function processPage(mutations) {
         // .u5Entry = Cards , .u4Entry = Magazine view
         // .u100Frame = full articles, .u100Entry = sidebar article
         // data-alternate-link
@@ -411,6 +411,37 @@
                 buttonsArray.push(new tumblrifyButtons(parentEl, data));
             });
         });
+        /*
+         *  Below is to handle moving the buttons in the sliding header while in sidebar view
+         *  To put it back, we need to detect when the sliding header is destroyed with MutationRecord.removedNodes
+         */
+        if (document.querySelector('.u100Entry.tumblrify')) {
+            var removedHeader = '';
+            let slidingHeader = document.querySelector('.headerInfo.sliderContainer:not(.moved)');
+            if (slidingHeader) {
+                let headerContent = slidingHeader.querySelector('.sliderWidth.sliderCenter'),
+                    buttonsContainer = slidingHeader.closest('.slideEntryContent').querySelector('.buttonsContainer');
+                if (headerContent && buttonsContainer) {
+                    buttonsContainer.classList.add('moved');
+                    slidingHeader.classList.add('moved');
+                    headerContent.appendChild(buttonsContainer);
+                }
+            }
+            for (let records of mutations) {
+                if (records.removedNodes.length) {
+                    removedHeader = Array.from(records.removedNodes).filter(function (itm) {
+                        if (itm.nodeType !== 1) { return false; }
+                        return (itm.querySelector('.buttonsContainer.moved') && itm.parentElement === null);
+                    });
+                }
+            }
+            if (removedHeader.length) {
+                let parentEl = document.querySelector('.u100Entry.tumblrify .headerInfo.headerInfo-article'),
+                    buttonsContainer = removedHeader[0].querySelector('.buttonsContainer.moved');
+                buttonsContainer.classList.remove('moved');
+                parentEl.appendChild(buttonsContainer);
+            }
+        }
     }
 
     chrome.storage.onChanged.addListener(() => getStatus()

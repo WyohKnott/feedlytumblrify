@@ -27,7 +27,7 @@
     bottom: initial;
     text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white;
 }
-
+.sliderWidth.sliderCenter .buttonsContainer,
 .u100Frame .buttonsContainer,
 .u100Entry .buttonsContainer {
     float: left;
@@ -59,9 +59,7 @@
     position: absolute;
     z-index: 1001;
 }
-.u4Entry .popupContainer,
-.u100Frame .popupContainer,
-.u100Entry .popupContainer {
+.u4Entry .popupContainer {
     right: -46px;
     left: initial;
 }
@@ -101,11 +99,7 @@
     pointer-events: none;
 }
 .u4Entry .arrow:after,
-.u4Entry .arrow:before,
-.u100Frame .arrow:after,
-.u100Frame .arrow:before,
-.u100Entry .arrow:after,
-.u100Entry .arrow:before {
+.u4Entry .arrow:before {
     left: 80%;
 }
 .arrow:after {
