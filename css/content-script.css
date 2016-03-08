@@ -1,5 +1,5 @@
-.u4Entry.tumblrify,
-.u5Entry.tumblrify {
+.u4Entry,
+.u5Entry {
     position: relative;
 }
 
@@ -15,9 +15,9 @@
 .u4Entry .buttonsContainer {
     position: absolute;
     top: initial;
-    right: 0;
+    right: 10px;
     left: initial;
-    bottom: 0;
+    bottom: 10px;
 }
 .u5Entry .buttonsContainer {
     position: absolute;

@@ -389,6 +389,7 @@
                 '.u4Entry:not(.tumblrify), .u5Entry:not(.tumblrify), .u100Entry:not(.tumblrify), .u100Frame:not(.tumblrify)'
             )),
             filteredNodes = nodes.filter(function (itm) {
+                if (itm.querySelectorAll('.buttonsContainer').length) { return false;}
                 let link = itm.getAttribute('data-alternate-link');
                 return blogpostRegex.test(link);
             });
