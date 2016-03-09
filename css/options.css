@@ -1,0 +1,63 @@
+body {
+    align-items: flex-start;
+    background-color: #36465d;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+    justify-content: flex-start;
+    margin: 0;
+    margin-top: 0.2em;
+}
+#tabNav {
+    align-items: flex-start;
+    border-bottom: 1px solid #4a9aca;
+    box-sizing: border-box;
+    display: flex;
+    flex: 1 0 fit-content;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+}
+.tabButton {
+    background-color: #9da6af;
+    border: 1px solid #9da6af;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom: 1px solid #9da6af;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 20px;
+    margin: 0;
+    padding: 4px 7px 5px;
+    margin: 0 0.2em;
+    text-decoration: none;
+    padding: 0.5em 1em;
+    }
+*:focus, *:active, *:visited {
+    outline: 0;
+    outline-style: none;
+    outline-width: 0;
+    -moz-outline-width: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+.tabButton:active,.tabButton:visited {
+    background-color: #929ca6;
+    border-color: #929ca6;
+    color: rgba(255, 255, 255, .8);
+}
+.tabButton.selected {
+    background-color: #4a9aca;
+    border-color: #4a9aca;
+    color: rgba(255, 255, 255, .9);
+}
+iframe {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    width: 100%;
+}
