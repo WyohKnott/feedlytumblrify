@@ -1,4 +1,6 @@
-/* jshint esversion: 6 */
+/*jshint esversion: 6 */
+/*jslint multivar*/
+/*global chrome, OAuth, fT, URL, URLSearchParams */
 (function () {
     "use strict";
 
@@ -9,23 +11,26 @@
         statusText = document.getElementById('status'),
         accountText = document.getElementById('account'),
         avatar = document.getElementById('statusWrap'),
-        callbackRegex = new RegExp('^https://localhost/redirectpage.*$', 'i');
+        callbackRegex = new RegExp('^https:\/\/localhost\/redirectpage.*$', 'i'),
+        login,
+        getAccessToken,
+        update;
 
     // Oauth connection logic
     // Step 1
-    var login = function () {
+    login = function () {
         var config = {},
             tokens = {
-            consumerKey: consumerKeyInput.value,
-            consumerSecret: consumerSecretInput.value
-        };
+                consumerKey: consumerKeyInput.value,
+                consumerSecret: consumerSecretInput.value
+            };
         if (!tokens.consumerKey || !tokens.consumerSecret) {
             console.log('Missing consumerKey and consumerSecret');
             return;
         }
-        config = Object.assign(tokens, tumblrEndpoints);
-        tumblrClient = OAuth(config);
-        tumblrClient.fetchRequestToken().then(function (url) {
+        config = Object.assign(tokens, fT.tumblrEndpoints);
+        fT.tumblrClient = new OAuth(config);
+        fT.tumblrClient.fetchRequestToken().then(function (url) {
             console.info('OAuth: request tokens obtained');
             chrome.tabs.create({
                 url: url,
@@ -34,7 +39,7 @@
         }).catch(function (err) {
             console.error('OAuth: error while fetching request tokens: ', err.statusText);
             // We still save the consumerKey and secret
-            setPrefs({
+            fT.setPrefs({
                 tumblrTokens: {
                     consumerKey: config.consumerKey,
                     consumerSecret: config.consumerSecret,
@@ -42,7 +47,7 @@
                     accessTokenSecret: ''
                 }
             });
-            tumblrClient = {};
+            fT.tumblrClient = {};
         });
     };
 
@@ -55,36 +60,36 @@
                 console.error('Could not determine the oauth_verifier');
                 return;
             }
-            if (typeof tumblrClient.setVerifier !== 'function') {
+            if (typeof fT.tumblrClient.setVerifier !== 'function') {
                 throw new Error('tumblrClient is not correctly initialized');
             }
-            tumblrClient.setVerifier(verifier);
+            fT.tumblrClient.setVerifier(verifier);
             getAccessToken();
             chrome.tabs.remove(tabId);
         }
     });
 
     // Step 3
-    var getAccessToken = function () {
-        if (typeof tumblrClient.fetchAccessToken !== 'function') {
+    getAccessToken = function () {
+        if (typeof fT.tumblrClient.fetchAccessToken !== 'function') {
             throw new Error('tumblrClient is not correctly initialized');
         }
-        var tempTokens = tumblrClient.getTokens();
-        tumblrClient.fetchAccessToken().then(function (response) {
+        var tempTokens = fT.tumblrClient.getTokens();
+        fT.tumblrClient.fetchAccessToken().then(function () {
             console.info('OAuth: access tokens obtained');
-            tumblrClient.setVerifier('');
-            setPrefs({
+            fT.tumblrClient.setVerifier('');
+            fT.setPrefs({
                 tumblrTokens: {
                     consumerKey: tempTokens.consumerKey,
                     consumerSecret: tempTokens.consumerSecret,
-                    accessTokenKey: tumblrClient.getAccessTokenKey(),
-                    accessTokenSecret: tumblrClient.getAccessTokenSecret()
+                    accessTokenKey: fT.tumblrClient.getAccessTokenKey(),
+                    accessTokenSecret: fT.tumblrClient.getAccessTokenSecret()
                 }
             });
         }).catch(function (err) {
             console.error('OAuth: error while fetching access tokens: ', err.statusText);
-            tumblrClient.setVerifier('');
-            setPrefs({
+            fT.tumblrClient.setVerifier('');
+            fT.setPrefs({
                 tumblrTokens: {
                     consumerKey: tempTokens.consumerKey,
                     consumerSecret: tempTokens.consumerSecret,
@@ -95,7 +100,7 @@
         });
     };
 
-    function update(status) {
+    update = function (status) {
         if (status.logged) {
             consumerKeyInput.value = status.consumerKey;
             consumerKeyInput.disabled = true;
@@ -104,7 +109,7 @@
             statusText.textContent = 'logged as';
             accountText.textContent = status.account;
             avatar.style.background = 'url(https://api.tumblr.com/v2/blog/' + status.account +
-                '.tumblr.com/avatar/128) no-repeat center';
+                    '.tumblr.com/avatar/128) no-repeat center';
             loginButton.disabled = true;
             logoutButton.disabled = false;
             document.body.classList.remove('loggedout');
@@ -122,12 +127,16 @@
             document.body.classList.remove('loggedin');
             document.body.classList.add('loggedout');
         }
-    }
+    };
 
     loginButton.addEventListener('click', login, false);
-    logoutButton.addEventListener('click', logout, false);
+    logoutButton.addEventListener('click', fT.logout, false);
 
-    chrome.storage.onChanged.addListener(() => getStatus().then((status) => update(status)));
-    getStatus().then((status) => update(status));
+    chrome.storage.onChanged.addListener(function (changes, areaName) {
+        if (changes.tumblrTokens && areaName === 'local') {
+            fT.getStatus().then((status) => update(status));
+        }
+    });
+    fT.getStatus().then((status) => update(status));
 
 }());

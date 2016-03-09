@@ -1,9 +1,11 @@
 /* jshint esversion: 6 */
+/*jslint multivar*/
+/*global chrome, OAuth, fT */
 (function () {
     "use strict";
 
     var blogsList = [],
-        blogpostRegex = /^https?:\/\/[\da-z\.-]+\.[a-z\.]{2,6}\/post\/\d+\/?.*$/i,
+        blogpostRegex = new RegExp(/^https?:\/\/[\da-z\.\-]+\.[a-z\.]{2,6}\/post\/\d+\/?.*$/, 'i'),
         obsConfig = {
             attributes: false,
             childList: true,
@@ -22,11 +24,11 @@
     }
 
     function startup(status) {
-        tumblrClient.request('https://api.tumblr.com/v2/user/info').then(function (response) {
+        fT.tumblrClient.request('https://api.tumblr.com/v2/user/info').then(function (response) {
             return response.json();
         }).then(function (data) {
-            let blogs = data.response.user.blogs;
             blogsList = [];
+            let blogs = data.response.user.blogs;
             blogs.forEach(function (itm) {
                 blogsList.push(itm.name + '.tumblr.com');
             });
@@ -38,7 +40,7 @@
         }).catch(function (err) {
             console.warn('Error while connecting to Tumblr', err);
             if (err.status === 401) {
-                getStatus().then((status) => update(status));
+                fT.getStatus().then((status) => update(status));
             }
         });
     }
@@ -46,7 +48,7 @@
     function cleanup() {
         observer.disconnect();
         buttonsArray.forEach(function (el) {
-            if (el instanceof tumblrifyButtons) {
+            if (el instanceof TumblrifyButtons) {
                 el.destroy();
             }
         });
@@ -55,314 +57,287 @@
     }
 
     var reblogPopup = (function () {
-        function reblogPopup(el, data) {
-            if (!(this instanceof reblogPopup)) {
-                return new reblogPopup(el, data);
-            }
-            return this.init(el, data);
+        function ReblogPopup(el, data) {
+            let popupWrapper = document.createElement('div'),
+                arrowDiv = document.createElement('div'),
+                tagsInput = document.createElement('input'),
+                clearTagsButton = document.createElement('button'),
+                restoreTagsButton = document.createElement('button'),
+                commentArea = document.createElement('div'),
+                attachReblogCheckbox = document.createElement('input'),
+                attachReblogLabel = document.createElement('label'),
+                blogsSelect = document.createElement('select'),
+                buttonsGroup = document.createElement('div'),
+                publishButton = document.createElement('button'),
+                queueButton = document.createElement('button'),
+                draftButton = document.createElement('button'),
+                parentEl = el;
+
+            this.popupContainer = document.createElement('div');
+            this.postData = data;
+
+            this.popupContainer.addEventListener('click', (e) => e.stopPropagation(), false);
+            publishButton.addEventListener('click', this.publish.bind(this), false);
+            queueButton.addEventListener('click', this.queue.bind(this), false);
+            draftButton.addEventListener('click', this.draft.bind(this), false);
+            clearTagsButton.addEventListener('click', this.clearTags.bind(this), false);
+            restoreTagsButton.addEventListener('click', this.restoreTags.bind(this), false);
+            this.popupContainer.addEventListener('keydown', this.keyHandler.bind(this), false);
+
+            tagsInput.name = 'tags';
+            blogsSelect.name = 'blog_identifier';
+            attachReblogCheckbox.name = 'attachReblog';
+
+            tagsInput.value = this.postData.tags.join(',');
+            blogsList.forEach(function (itm) {
+                let blogItm = document.createElement('option');
+                blogItm.value = itm;
+                blogItm.innerText = itm;
+                blogsSelect.appendChild(blogItm);
+            });
+
+            publishButton.innerText = '\ue040';
+            queueButton.innerText = '\ue8b5';
+            draftButton.innerText = '\ue882';
+            clearTagsButton.innerText = 'Clear tags';
+            restoreTagsButton.innerText = 'Restore tags';
+
+            attachReblogCheckbox.type = 'checkbox';
+            attachReblogCheckbox.value = 'attach_reblog_tree';
+            attachReblogCheckbox.checked = false;
+            attachReblogLabel.innerText = 'Remove comment tree';
+            attachReblogLabel.insertBefore(attachReblogCheckbox, attachReblogLabel.childNodes[0]);
+
+            publishButton.classList.add('blue');
+            queueButton.classList.add('blue');
+            draftButton.classList.add('blue');
+            restoreTagsButton.style.display = 'none';
+
+            arrowDiv.classList.add('arrow');
+            popupWrapper.classList.add('popupWrapper');
+            this.popupContainer.classList.add('popupContainer');
+            commentArea.classList.add('commentArea');
+            buttonsGroup.classList.add('buttonsGroup');
+            publishButton.classList.add('publishButton');
+            queueButton.classList.add('queueButton');
+            draftButton.classList.add('draftButton');
+            clearTagsButton.classList.add('clearTagsButton');
+            restoreTagsButton.classList.add('restoreTagsButton');
+
+            buttonsGroup.appendChild(publishButton);
+            buttonsGroup.appendChild(queueButton);
+            buttonsGroup.appendChild(draftButton);
+            popupWrapper.appendChild(tagsInput);
+            popupWrapper.appendChild(clearTagsButton);
+            popupWrapper.appendChild(restoreTagsButton);
+            popupWrapper.appendChild(commentArea);
+            popupWrapper.appendChild(attachReblogLabel);
+            popupWrapper.appendChild(blogsSelect);
+            popupWrapper.appendChild(buttonsGroup);
+
+            this.editor = new MediumEditor(commentArea, {
+                activeButtonClass: 'medium-editor-button-active',
+                buttonLabels: 'fontawesome',
+                contentWindow: window,
+                delay: 0,
+                disableReturn: false,
+                disableDoubleReturn: false,
+                disableExtraSpaces: false,
+                disableEditing: false,
+                elementsContainer: false,
+                extensions: {},
+                ownerDocument: document,
+                spellcheck: true,
+                targetBlank: false,
+                toolbar: {
+                    allowMultiParagraphSelection: true,
+                    buttons: ['bold', 'italic', 'h2', 'anchor', 'strikethrough',
+                        'orderedlist', 'unorderedlist', 'indent', 'outdent',
+                        'quote'
+                    ]
+                }
+            });
+            // do not not propagate to Feedly shortcuts!
+            commentArea.addEventListener('input', (e) => e.stopPropagation(), false);
+            commentArea.addEventListener('keypress', (e) => e.stopPropagation(), false);
+            commentArea.addEventListener('keyup', (e) => e.stopPropagation(), false);
+
+            this.popupContainer.appendChild(arrowDiv);
+            this.popupContainer.appendChild(popupWrapper);
+            parentEl.appendChild(this.popupContainer);
+
+            return this;
         }
 
-        reblogPopup.prototype = {
-            popupContainer: '',
-            editor: '',
-            postData: '',
+        ReblogPopup.prototype.clearTags = function () {
+            let tagsInput = this.popupContainer.querySelector('[name=tags]'),
+                clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
+                restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
 
-            init: function (el, data) {
-                let popupWrapper = document.createElement('div'),
-                    arrowDiv = document.createElement('div'),
-                    tagsInput = document.createElement('input'),
-                    clearTagsButton = document.createElement('button'),
-                    restoreTagsButton = document.createElement('button'),
-                    commentArea = document.createElement('div'),
-                    attachReblogCheckbox = document.createElement('input'),
-                    attachReblogLabel = document.createElement('label'),
-                    blogsSelect = document.createElement('select'),
-                    buttonsGroup = document.createElement('div'),
-                    publishButton = document.createElement('button'),
-                    queueButton = document.createElement('button'),
-                    draftButton = document.createElement('button'),
-                    parentEl = el;
+            tagsInput.value = '';
+            clearTagsButton.style.display = 'none';
+            restoreTagsButton.style.display = 'inline-block';
+        };
 
-                this.popupContainer = document.createElement('div');
-                this.postData = data;
+        ReblogPopup.prototype.restoreTags = function () {
+            let tagsInput = this.popupContainer.querySelector('[name=tags]'),
+                clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
+                restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
 
-                this.popupContainer.addEventListener('click', (e) => e.stopPropagation(), false);
-                publishButton.addEventListener('click', this.publish.bind(this), false);
-                queueButton.addEventListener('click', this.queue.bind(this), false);
-                draftButton.addEventListener('click', this.draft.bind(this), false);
-                clearTagsButton.addEventListener('click', this.clearTags.bind(this), false);
-                restoreTagsButton.addEventListener('click', this.restoreTags.bind(this), false);
-                this.popupContainer.addEventListener('keydown', this.keyHandler.bind(this), false);
-
-                tagsInput.name = 'tags';
-                blogsSelect.name = 'blog_identifier';
-                attachReblogCheckbox.name = 'attachReblog';
-
-                tagsInput.value = this.postData.tags.join(',');
-                blogsList.forEach(function (itm) {
-                    let blogItm = document.createElement('option');
-                    blogItm.value = itm;
-                    blogItm.innerText = itm;
-                    blogsSelect.appendChild(blogItm);
-                });
-
-                publishButton.innerText = '\ue040';
-                queueButton.innerText = '\ue8b5';
-                draftButton.innerText = '\ue882';
-                clearTagsButton.innerText = 'Clear tags';
-                restoreTagsButton.innerText = 'Restore tags';
-
-                attachReblogCheckbox.type = 'checkbox';
-                attachReblogCheckbox.value = 'attach_reblog_tree';
-                attachReblogCheckbox.checked = false;
-                attachReblogLabel.innerText = 'Remove comment tree';
-                attachReblogLabel.insertBefore(attachReblogCheckbox, attachReblogLabel.childNodes[0]);
-
-                publishButton.classList.add('blue');
-                queueButton.classList.add('blue');
-                draftButton.classList.add('blue');
-                restoreTagsButton.style.display = 'none';
-
-                arrowDiv.classList.add('arrow');
-                popupWrapper.classList.add('popupWrapper');
-                this.popupContainer.classList.add('popupContainer');
-                commentArea.classList.add('commentArea');
-                buttonsGroup.classList.add('buttonsGroup');
-                publishButton.classList.add('publishButton');
-                queueButton.classList.add('queueButton');
-                draftButton.classList.add('draftButton');
-                clearTagsButton.classList.add('clearTagsButton');
-                restoreTagsButton.classList.add('restoreTagsButton');
-
-                buttonsGroup.appendChild(publishButton);
-                buttonsGroup.appendChild(queueButton);
-                buttonsGroup.appendChild(draftButton);
-                popupWrapper.appendChild(tagsInput);
-                popupWrapper.appendChild(clearTagsButton);
-                popupWrapper.appendChild(restoreTagsButton);
-                popupWrapper.appendChild(commentArea);
-                popupWrapper.appendChild(attachReblogLabel);
-                popupWrapper.appendChild(blogsSelect);
-                popupWrapper.appendChild(buttonsGroup);
-
-                this.editor = new MediumEditor(commentArea, {
-                    activeButtonClass: 'medium-editor-button-active',
-                    buttonLabels: 'fontawesome',
-                    contentWindow: window,
-                    delay: 0,
-                    disableReturn: false,
-                    disableDoubleReturn: false,
-                    disableExtraSpaces: false,
-                    disableEditing: false,
-                    elementsContainer: false,
-                    extensions: {},
-                    ownerDocument: document,
-                    spellcheck: true,
-                    targetBlank: false,
-                    toolbar: {
-                        allowMultiParagraphSelection: true,
-                        buttons: ['bold', 'italic', 'h2', 'anchor', 'strikethrough',
-                            'orderedlist', 'unorderedlist', 'indent', 'outdent',
-                            'quote'
-                        ],
-                    }
-                });
-                // do not not propagate to Feedly shortcuts!
-                commentArea.addEventListener('input', (e) => e.stopPropagation(), false);
-                commentArea.addEventListener('keypress', (e) => e.stopPropagation(), false);
-                commentArea.addEventListener('keyup', (e) => e.stopPropagation(), false);
-
-                this.popupContainer.appendChild(arrowDiv);
-                this.popupContainer.appendChild(popupWrapper);
-
-                parentEl.appendChild(this.popupContainer);
-                return this;
-            },
-
-            clearTags: function () {
-                let tagsInput = this.popupContainer.querySelector('[name=tags]'),
-                    clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
-                    restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
-                tagsInput.value = '';
-                clearTagsButton.style.display = 'none';
-                restoreTagsButton.style.display = 'inline-block';
-            },
-
-            restoreTags: function () {
-                let tagsInput = this.popupContainer.querySelector('[name=tags]'),
-                    clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
-                    restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
-                tagsInput.value = tagsInput.value.trim();
-                if (tagsInput.value.length) {
-                    tagsInput.value += ', ';
-                }
-                tagsInput.value += this.postData.tags.join(',');
-                clearTagsButton.style.display = 'inline-block';
-                restoreTagsButton.style.display = 'none';
-            },
-
-            publish: function () {
-                this.reblog('published');
-            },
-
-            queue: function () {
-                this.reblog('queue');
-
-            },
-
-            draft: function () {
-                this.reblog('draft');
-            },
-
-            reblog: function (state) {
-                var popup = this;
-                let blog_identifier = this.popupContainer.querySelector('[name=blog_identifier]').value
-                    .trim(),
-                    comment = this.popupContainer.querySelector('.commentArea').innerHTML.trim().replace(
-                        /\r\n|\r|\n/g, '<br />'),
-                    tags = this.popupContainer.querySelector('[name=tags]').value.trim().replace(
-                        /-/g, ' '),
-                    attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked,
-                    buttonsGroup = this.popupContainer.querySelector('.buttonsGroup');
-                Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = true);
-                return tumblrClient.request('https://api.tumblr.com/v2/blog/' + blog_identifier +
-                    '/post/reblog', {
-                        method: 'POST',
-                        body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key +
-                            '&state=' + state + '&comment=' + comment + '&tags=' + tags +
-                            '&attach_reblog_tree=' + attachReblog
-                    }).then(function (response) {
-                    let showReblogButton = popup.popupContainer.parentElement.querySelector(
-                        '.ic-reblog');
-                    popup.close();
-                    showReblogButton.classList.add('reblogged');
-                    return response.json();
-                }).catch(function (err) {
-                    console.warn('Error while reblogging post', err);
-                    if (err.status === 401) {
-                        getStatus().then((status) => update(status));
-                    }
-                });
-            },
-
-            keyHandler: function (event) {
-                event.stopPropagation();
-                if (event.keyCode === 27) {
-                    this.close();
-                }
-            },
-
-            close: function () {
-                this.popupContainer.style.display = 'none';
+            tagsInput.value = tagsInput.value.trim();
+            if (tagsInput.value.length) {
+                tagsInput.value += ', ';
             }
+            tagsInput.value += this.postData.tags.join(',');
+            clearTagsButton.style.display = 'inline-block';
+            restoreTagsButton.style.display = 'none';
+        };
+
+        ReblogPopup.prototype.publish = function () {
+            this.reblog('published');
+        };
+
+        ReblogPopup.prototype.queue = function () {
+            this.reblog('queue');
 
         };
 
-        return reblogPopup;
+        ReblogPopup.prototype.draft = function () {
+            this.reblog('draft');
+        };
 
+        ReblogPopup.prototype.reblog = function (state) {
+            var popup = this;
+            let blog_identifier = this.popupContainer.querySelector('[name=blog_identifier]').value
+                .trim(),
+                comment = this.popupContainer.querySelector('.commentArea').innerHTML.trim().replace(
+                    /\r\n|\r|\n/g, '<br />'),
+                tags = this.popupContainer.querySelector('[name=tags]').value.trim().replace(
+                    /-/g, ' '),
+                attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked,
+                buttonsGroup = this.popupContainer.querySelector('.buttonsGroup');
+
+            Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = true);
+
+            return fT.tumblrClient.request('https://api.tumblr.com/v2/blog/' + blog_identifier + '/post/reblog', {
+                    method: 'POST',
+                    body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key +
+                        '&state=' + state + '&comment=' + comment + '&tags=' + tags +
+                        '&attach_reblog_tree=' + attachReblog
+            }).then(function (response) {
+                let showReblogButton = popup.popupContainer.parentElement.querySelector(
+                    '.ic-reblog');
+                popup.close();
+                showReblogButton.classList.add('reblogged');
+                return response.json();
+            }).catch(function (err) {
+                console.warn('Error while reblogging post', err);
+                if (err.status === 401) {
+                    fT.getStatus().then((status) => update(status));
+                }
+            });
+        };
+
+        ReblogPopup.prototype.keyHandler = function (event) {
+            event.stopPropagation();
+            if (event.keyCode === 27) {
+                this.close();
+            }
+        };
+
+        ReblogPopup.prototype.close = function () {
+            this.popupContainer.style.display = 'none';
+        };
+
+        return ReblogPopup;
     }());
 
     var tumblrifyButtons = (function () {
-        function tumblrifyButtons(el, data) {
-            if (!(this instanceof tumblrifyButtons)) {
-                return new tumblrifyButtons(el, data);
+        function TumblrifyButtons(el, data) {
+            let likeButton = document.createElement('i'),
+                showReblogButton = document.createElement('i'),
+                parentEl = el;
+
+            this.buttonsContainer = document.createElement('div');
+            this.postData = data;
+
+            this.buttonsContainer.addEventListener('click', (e) => e.stopPropagation(), false);
+            likeButton.addEventListener('click', this.like.bind(this), false);
+            showReblogButton.addEventListener('click', this.showReblog.bind(this), false);
+
+            this.buttonsContainer.classList.add('buttonsContainer');
+            likeButton.classList.add('ic', 'ic-lg', 'ic-like');
+            if (data.liked) {
+                likeButton.classList.add('liked');
             }
-            return this.init(el, data);
+            showReblogButton.classList.add('ic', 'ic-lg', 'ic-reblog');
+
+            this.buttonsContainer.appendChild(likeButton);
+            this.buttonsContainer.appendChild(showReblogButton);
+
+            parentEl.appendChild(this.buttonsContainer);
+            return this;
         }
 
-        tumblrifyButtons.prototype = {
-            buttonsContainer: '',
-            postData: '',
-            popup: '',
-
-            init: function (el, data) {
-                let likeButton = document.createElement('i'),
-                    showReblogButton = document.createElement('i'),
-                    parentEl = el;
-
-                this.buttonsContainer = document.createElement('div');
-                this.postData = data;
-
-                this.buttonsContainer.addEventListener('click', (e) => e.stopPropagation(), false);
-                likeButton.addEventListener('click', this.like.bind(this), false);
-                showReblogButton.addEventListener('click', this.showReblog.bind(this), false);
-
-                this.buttonsContainer.classList.add('buttonsContainer');
-                likeButton.classList.add('ic', 'ic-lg', 'ic-like');
-                if (data.liked) {
-                    likeButton.classList.add('liked');
-                }
-                showReblogButton.classList.add('ic', 'ic-lg', 'ic-reblog');
-
-                this.buttonsContainer.appendChild(likeButton);
-                this.buttonsContainer.appendChild(showReblogButton);
-
-                parentEl.appendChild(this.buttonsContainer);
-                return this;
-            },
-
-            like: function (event) {
-                var data = this;
-                let res,
-                    likeButton = this.buttonsContainer.children[0];
-                event.stopPropagation();
-                if (this.postData.liked) {
-                    res = tumblrClient.request('https://api.tumblr.com/v2/user/unlike', {
-                        method: 'POST',
-                        body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key
-                    }).then(function (response) {
-                        likeButton.classList.remove('liked');
-                        data.postData.liked = false;
-                        return response;
-                    });
-                } else {
-                    res = tumblrClient.request('https://api.tumblr.com/v2/user/like', {
-                        method: 'POST',
-                        body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key
-                    }).then(function (response) {
-                        likeButton.classList.add('liked');
-                        data.postData.liked = true;
-                        return response;
-                    });
-                }
-                return res.catch(function (err) {
-                    console.warn('Error while liking post', err);
-                    if (err.status === 401) {
-                        getStatus().then((status) => update(status));
-                    }
+        TumblrifyButtons.prototype.like = function (event) {
+            var data = this;
+            let res,
+                likeButton = this.buttonsContainer.children[0];
+            event.stopPropagation();
+            if (this.postData.liked) {
+                res = fT.tumblrClient.request('https://api.tumblr.com/v2/user/unlike', {
+                    method: 'POST',
+                    body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key
+                }).then(function (response) {
+                    likeButton.classList.remove('liked');
+                    data.postData.liked = false;
+                    return response;
                 });
-            },
-
-            showReblog: function (event) {
-                event.stopPropagation();
-                this.popup = (this.popup instanceof reblogPopup) ? this.popup : reblogPopup(this.buttonsContainer,
-                    this.postData);
-                if (this.popup.popupContainer.style.display !== 'block') {
-                    this.popup.popupContainer.style.display = 'block';
-                    let buttonsGroup = this.popup.popupContainer.querySelector('.buttonsGroup');
-                    Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
-                } else {
-                    this.popup.close();
-                }
-            },
-
-            destroy: function () {
-                let parentEl = this.buttonsContainer.parentElement;
-                parentEl.removeChild(this.buttonsContainer);
-                parentEl.closest('.tumblrify').classList.remove('tumblrify');
-                delete this.buttonsContainer;
-                delete this.postData;
-                delete this.popupContainer;
+            } else {
+                res = fT.tumblrClient.request('https://api.tumblr.com/v2/user/like', {
+                    method: 'POST',
+                    body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key
+                }).then(function (response) {
+                    likeButton.classList.add('liked');
+                    data.postData.liked = true;
+                    return response;
+                });
             }
-
+            return res.catch(function (err) {
+                console.warn('Error while liking post', err);
+                if (err.status === 401) {
+                    fT.getStatus().then((status) => update(status));
+                }
+            });
         };
 
-        return tumblrifyButtons;
+        TumblrifyButtons.prototype.showReblog = function (event) {
+            event.stopPropagation();
+            this.popup = (this.popup instanceof reblogPopup) ? this.popup : new reblogPopup(this.buttonsContainer,
+                this.postData);
+            if (this.popup.popupContainer.style.display !== 'block') {
+                this.popup.popupContainer.style.display = 'block';
+                let buttonsGroup = this.popup.popupContainer.querySelector('.buttonsGroup');
+                Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
+            } else {
+                this.popup.close();
+            }
+        };
 
+        TumblrifyButtons.prototype.destroy = function () {
+            let parentEl = this.buttonsContainer.parentElement;
+            parentEl.removeChild(this.buttonsContainer);
+            parentEl.closest('.tumblrify').classList.remove('tumblrify');
+            delete this.buttonsContainer;
+            delete this.postData;
+            delete this.popupContainer;
+        };
+
+        return TumblrifyButtons;
     }());
 
     function getPost(blogName, id) {
-        return tumblrClient.request('https://api.tumblr.com/v2/blog/' + blogName + '/posts?id=' + id).then(function (
+        return fT.tumblrClient.request('https://api.tumblr.com/v2/blog/' + blogName + '/posts?id=' + id).then(function (
             response) {
             return response.json();
         }).then(function (data) {
@@ -374,7 +349,7 @@
                     tags: data.response.posts[0].tags
                 };
             } else {
-                throw new Error({status: 404, statusTest: 'No post returned'});
+                throw new Error({status: 404, statusTest: 'Not found'});
             }
         });
     }
@@ -391,6 +366,7 @@
                 let link = itm.getAttribute('data-alternate-link');
                 return blogpostRegex.test(link);
             });
+
         filteredNodes.forEach(function (itm) {
             let url = new URL(itm.getAttribute('data-alternate-link')),
                 blogName = url.hostname,
@@ -410,7 +386,7 @@
             }).catch(function (err) {
                 console.log('Error while fetching post', blogName, id, err.statusText);
                 if (err.status === 401) {
-                    getStatus().then((status) => update(status));
+                    fT.getStatus().then((status) => update(status));
                 }
             });
         });
@@ -457,9 +433,11 @@
         });
     }, 120000);
 
-    chrome.storage.onChanged.addListener(() => getStatus()
-        .then((status) => update(status))
-    );
-    getStatus().then((status) => update(status));
+    chrome.storage.onChanged.addListener(function (changes, areaName) {
+        if (changes.tumblrTokens && areaName === 'local') {
+            fT.getStatus().then((status) => update(status));
+        }
+    });
+    fT.getStatus().then((status) => update(status));
 
 }());
