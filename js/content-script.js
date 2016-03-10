@@ -88,7 +88,15 @@
             blogsSelect.name = 'blog_identifier';
             attachReblogCheckbox.name = 'attachReblog';
 
-            tagsInput.value = this.postData.tags.join(',');
+
+            tagsInput.value =  this.postData.tags.join(',');
+            fT.getPrefs('autotagger').then(function (response) {
+                if (response.autotagger) {
+                    let autotags = response.autotagger[this.postData.type];
+                    tagsInput.value = autotags.length ? autotags + ',' + tagsInput.value : tagsInput.value;
+                }
+            }.bind(this));
+
             blogsList.forEach(function (itm) {
                 let blogItm = document.createElement('option');
                 blogItm.value = itm;
@@ -174,7 +182,15 @@
                 clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
                 restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
 
+            //we keep autotag value. Yay or nay?
             tagsInput.value = '';
+            fT.getPrefs('autotagger').then(function (response) {
+                if (response.autotagger) {
+                    let autotags = response.autotagger[this.postData.type];
+                    tagsInput.value = autotags;
+                }
+            }.bind(this));
+
             clearTagsButton.style.display = 'none';
             restoreTagsButton.style.display = 'inline-block';
         };
@@ -345,6 +361,7 @@
                 return {
                     id: data.response.posts[0].id,
                     reblog_key: data.response.posts[0].reblog_key,
+                    type: data.response.posts[0].type,
                     liked: data.response.posts[0].liked,
                     tags: data.response.posts[0].tags
                 };

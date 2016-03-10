@@ -1,3 +1,6 @@
+/*jshint esversion: 6 */
+/*jslint multivar*/
+/*global URL */
 (function () {
 
     'use strict';
@@ -5,11 +8,22 @@
     var resize = function () {
         let iframe = document.getElementById('iframe');
         iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px';
+        iframe.focus();
+    };
+
+    var iframeOnChange = function () {
+        let tabUrl = this.src.substring(iframe.src.lastIndexOf('/') + 1),
+            currentTab = document.querySelector('.tabButton.selected'),
+            tabButton = document.querySelector('[href="#' + tabUrl + '"]');
+        if (currentTab) {
+            currentTab.classList.remove('selected');
+        }
+        tabButton.classList.add('selected');
+        setTimeout(resize, 200);
     };
 
     var loadTab = function () {
-        let tabUrl = document.location.hash.slice(1),
-            currentTab = document.querySelector('.tabButton.selected');
+        let tabUrl = document.location.hash.slice(1);
         if (!tabUrl) {
             tabUrl = 'account.html';
         }
@@ -17,12 +31,7 @@
         if (!tabButton || tabButton.classList.contains('selected')) {
             return;
         }
-        if (currentTab) {
-            currentTab.classList.remove('selected');
-        }
         document.getElementById('iframe').src = tabUrl;
-        setTimeout(resize, 200);
-        tabButton.classList.add('selected');
     };
 
     var changeTab = function (event) {
@@ -37,6 +46,7 @@
         }
     };
 
+    document.getElementById('iframe').addEventListener('load', iframeOnChange, false);
     Array.from(document.getElementsByClassName('tabButton')).forEach((itm) => itm.addEventListener('click', changeTab, false));
     loadTab();
 
