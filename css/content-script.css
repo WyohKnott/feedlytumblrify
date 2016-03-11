@@ -190,13 +190,6 @@
 }
 .popupWrapper input[type="checkbox"]:checked + label:before {
     content: '\f046';
-    font: normal normal normal 14px/1 'FontAwesome';
-    font-size: inherit;
-    text-rendering: auto;
-    margin-right: 0.6em;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    min-width: 1em;
 }
 .popupWrapper select {
     appearance: none;
@@ -280,7 +273,6 @@
     justify-content: flex-start;
     padding: 0.6em;
     position: relative;
-    tabindex: 0;
     text-decoration: none;
  }
  .dropdown li.focused {
@@ -303,12 +295,6 @@
 }
 .dropdown li.selected:before{
     content: '\f046';
-    font: normal normal normal 14px/1 'FontAwesome';
-    font-size: inherit;
-    text-rendering: auto;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    min-width: 1em;
 }
 .dropdown .li-group {
     align-items: stretch;

@@ -4,11 +4,8 @@
 (function () {
 
     //Debounce?
-    var save = function () {
-        var spinLabel = document.getElementById('spin'),
-            saveLabel = document.getElementById('save');
-
-        spinLabel.style.visibility = 'visible';
+    var save = function (event) {
+        var saveLabel = document.getElementById('save');
         saveLabel.style.visibility = 'visible';
         saveLabel.innerText = 'Saving…';
         fT.setPrefs({autotagger: {
@@ -21,15 +18,14 @@
             audio: document.getElementById('audio').value.trim(),
             chat: document.getElementById('chat').value.trim()
         }}).then(function () {
-            spinLabel.style.visibility = 'hidden';
             saveLabel.innerText = 'Saved';
             setTimeout(() => saveLabel.style.visibility = 'hidden', 3000);
-        })
+        });
     };
 
     fT.getPrefs('autotagger').then(function (response) {
         if (response.autotagger) {
-            for (itm of Object.keys(response.autotagger)) {
+            for (let itm of Object.keys(response.autotagger)) {
                 document.getElementById(itm).value = response.autotagger[itm];
             }
         }

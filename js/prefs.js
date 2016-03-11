@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 /*jslint multivar*/
-/*global chrome, OAuth, fT, URL, URLSearchParams */
+/*global chrome, OAuth, URL, URLSearchParams */
 var fT = (function () {
 
     "use strict";

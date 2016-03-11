@@ -98,11 +98,11 @@
                         nextFocus.addClass('focused');
                     }
                 } else if (event.keyCode === 38 || (event.shiftKey && event.keyCode === 9)) {
-                    let nextFocus = currentFocus.previousElementSibling;
+                    let previousFocus = currentFocus.previousElementSibling;
                     event.preventDefault();
-                    if (nextFocus) {
+                    if (previousFocus) {
                         currentFocus.classList.remove('focused');
-                        nextFocus.addClass('focused');
+                        previousFocus.addClass('focused');
                     }
                 } else if (event.keyCode === 13) {
                     event.preventDefault();
@@ -266,7 +266,7 @@
             blogsSelect.name = 'blog_identifier';
             attachReblogCheckbox.name = 'attachReblog';
 
-            fT.getPrefs('enableOriginalTags').then(function (prefs) {
+            fT.getPrefs('enableOriginalTags').then((function (prefs) {
                 if (prefs.enableOriginalTags) {
                     tagsInput.value =  this.postData.tags.join(',');
                     clearTagsButton.style.display = 'inline-block';
@@ -276,9 +276,16 @@
                     clearTagsButton.style.display = 'none';
                     restoreTagsButton.style.display = 'inline-block';
                 }
+            }).bind(this));
+
+            let promiseArr = [fT.getPrefs('autotagger'), fT.getPrefs('tagbundle')];
+            fT.getPrefs('enableTagsFrequency').then(function (prefs) {
+                if (prefs.enableTagsFrequency) {
+                    promiseArr.push();
+                }
             });
 
-            Promise.all([fT.getPrefs('autotagger'), fT.getPrefs('tagbundle')]).then((function (prefs) {
+            Promise.all(promiseArr).then((function (prefs) {
                 let optionsList = [];
                 if (prefs[0].autotagger) {
                     let autotags = prefs[0].autotagger[this.postData.type];
@@ -444,9 +451,9 @@
                         '&state=' + state + '&comment=' + comment + '&tags=' + tags +
                         '&attach_reblog_tree=' + attachReblog
             }).then((function (response) {
-                let showReblogButton = popup.popupContainer.parentElement.querySelector(
+                let showReblogButton = this.popupContainer.parentElement.querySelector(
                     '.fa-retweet');
-                popup.close();
+                this.close();
                 showReblogButton.classList.add('reblogged');
                 return response.json();
             }).bind(this)).catch(function (err) {
@@ -458,7 +465,9 @@
         };
 
         ReblogPopup.prototype.close = function () {
-            this.dropdown.close();
+            if (this.dropdown) {
+                this.dropdown.close();
+            }
             this.popupContainer.style.display = 'none';
         };
 

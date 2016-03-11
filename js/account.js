@@ -11,14 +11,22 @@
         statusText = document.getElementById('status'),
         accountText = document.getElementById('account'),
         avatar = document.getElementById('statusWrap'),
-        callbackRegex = new RegExp('^https:\/\/localhost\/redirectpage.*$', 'i'),
-        login,
-        getAccessToken,
-        update;
+        callbackRegex = new RegExp('^https:\/\/localhost\/redirectpage.*$', 'i');
+
+    function setDefaultPrefs () {
+        Promise.all([fT.getPrefs('enableOriginalTags'), fT.getPrefs('enableTagsFrequency')]).then(function (prefs) {
+            if (!prefs[0].hasOwnProperty('enableOriginalTags')) {
+                fT.setPrefs({enableOriginalTags: false});
+            }
+            if (!prefs[1].hasOwnProperty('enableTagsFrequency')) {
+                fT.setPrefs({enableTagsFrequency: false});
+            }
+        });
+    }
 
     // Oauth connection logic
     // Step 1
-    login = function () {
+    function login () {
         var config = {},
             tokens = {
                 consumerKey: consumerKeyInput.value,
@@ -49,7 +57,7 @@
             });
             fT.tumblrClient = {};
         });
-    };
+    }
 
     // Step 2
     chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
@@ -70,7 +78,7 @@
     });
 
     // Step 3
-    getAccessToken = function () {
+    function getAccessToken () {
         if (typeof fT.tumblrClient.fetchAccessToken !== 'function') {
             throw new Error('tumblrClient is not correctly initialized');
         }
@@ -98,9 +106,9 @@
                 }
             });
         });
-    };
+    }
 
-    update = function (status) {
+    function update (status) {
         if (status.logged) {
             consumerKeyInput.value = status.consumerKey;
             consumerKeyInput.disabled = true;
@@ -127,7 +135,7 @@
             document.body.classList.remove('loggedin');
             document.body.classList.add('loggedout');
         }
-    };
+    }
 
     loginButton.addEventListener('click', login, false);
     logoutButton.addEventListener('click', fT.logout, false);
@@ -137,6 +145,7 @@
             fT.getStatus().then((status) => update(status));
         }
     });
+    setDefaultPrefs();
     fT.getStatus().then((status) => update(status));
 
 }());
