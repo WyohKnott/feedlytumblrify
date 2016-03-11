@@ -52,8 +52,7 @@
   ],
 
   "web_accessible_resources": [
-    "assets/fontawesome-webfont.woff2",
-    "assets/icons.woff2"
+    "assets/fontawesome-webfont.woff2"
   ]
 
 }

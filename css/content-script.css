@@ -25,7 +25,10 @@
     left: initial;
     right: 0;
     bottom: initial;
-    text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white;
+    text-shadow: 1px 1px 2px white,
+                -1px 1px 2px white,
+                1px -1px 2px white,
+                -1px -1px 2px white;
 }
 .sliderWidth.sliderCenter .buttonsContainer,
 .u100Frame .buttonsContainer,
@@ -41,10 +44,10 @@
 .buttonsContainer > i {
     padding: 8px;
 }
-.buttonsContainer .ic-like.liked {
+.buttonsContainer .liked {
     color: #d95e40;
 }
-.buttonsContainer .ic-reblog.reblogged {
+.buttonsContainer .reblogged {
     color: #56bc8a;
 }
 /*
@@ -78,6 +81,7 @@
     min-width: 20rem;
     overflow: auto;
     padding: 1px;
+    position: relative;
     resize: both;
     width: 20rem;
 }
@@ -86,6 +90,9 @@
     margin-bottom: -3px;
     position: relative;
     width: 20rem;
+}
+.u4Entry .arrow {
+    align-self: flex-end;
 }
 .arrow:after,
 .arrow:before {
@@ -160,6 +167,42 @@
     padding: 4px 7px 5px;
     text-decoration: none;
 }
+.popupWrapper select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+.popupWrapper .divGroup > input[type="checkbox"] {
+    display:none;
+}
+.popupWrapper input[type="checkbox"] + label {
+    flex: 1 0 auto;
+}
+.popupWrapper input[type="checkbox"] + label:before {
+    content: '\f096';
+    font: normal normal normal 14px/1 'FontAwesome';
+    font-size: inherit;
+    margin-right: 0.6em;
+    text-rendering: auto;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    min-width: 1em;
+}
+.popupWrapper input[type="checkbox"]:checked + label:before {
+    content: '\f046';
+    font: normal normal normal 14px/1 'FontAwesome';
+    font-size: inherit;
+    text-rendering: auto;
+    margin-right: 0.6em;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    min-width: 1em;
+}
+.popupWrapper select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
 .popupWrapper *:focus,
 .popupWrapper *:active {
     outline: 0;
@@ -200,54 +243,122 @@
 }
 .buttonsGroup > button {
     flex-grow: 1;
-    font: normal normal normal 14px/1 'icons';
+    font: normal normal normal 14px/1 'FontAwesome';
     font-size: inherit;
     height: 35px;
     text-rendering: auto;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
+
 /*
- *  https://design.google.com/icons/ by Google - https://design.google.com/icons/
- *  CreativeCommons Attribution 4.0 (CC BY 4.0)
- *  https://creativecommons.org/licenses/by/4.0/
+ * Dropdown list
  */
 
-@font-face {
-    font-family: 'icons';
-    src: url('chrome-extension://__MSG_@@extension_id__/assets/icons.woff2') format('woff2'),
-         url('../assets/icons.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-.ic-queue:before {
-    content: "\e8b5";
-}
-.ic-edit:before {
-    content: "\e254";
-}
-.ic-like:before {
-    content: "\e87d";
-}
-.ic-draft:before {
-    content: "\e882";
-}
-.ic-reblog:before {
-    content: "\e040";
-}
-.ic-reblogged:before {
-    content: "\e041";
-}
-.ic {
-    display: inline-block;
-    font: normal normal normal 14px/1 'icons';
+.dropdown {
+    align-items: stretch;
+    box-sizing: border-box;
+    display: none;
+    background-color: #fff;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    text-decoration: none;
+    width: calc(100% - 2px);
+    z-index: 1003;
+ }
+ .dropdown li {
+    align-items: center;
+    border-right: 4px solid #9da6af;
+    border-left: 4px solid #9da6af;
+    border-top: 1px solid #9da6af;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0.6em;
+    position: relative;
+    tabindex: 0;
+    text-decoration: none;
+ }
+ .dropdown li.focused {
+    border-right: 4px solid #529ecc;
+    border-left: 4px solid #529ecc;
+ }
+ .dropdown li:last-child {
+    border-bottom: 1px solid #9da6af;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+ }
+.dropdown li:before {
+    content: '\f096';
+    font: normal normal normal 14px/1 'FontAwesome';
     font-size: inherit;
     text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    min-width: 1em;
 }
-.ic-lg {
-    font-size: 1.33333333em;
-    line-height: 0.75em;
-    vertical-align: -15%;
+.dropdown li.selected:before{
+    content: '\f046';
+    font: normal normal normal 14px/1 'FontAwesome';
+    font-size: inherit;
+    text-rendering: auto;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    min-width: 1em;
+}
+.dropdown .li-group {
+    align-items: stretch;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+    margin-left: 0.6em;
+    max-width: calc(100% - 1em);
+    justify-content: flex-start;
+}
+.dropdown .li-group > * {
+    box-sizing: border-box;
+    padding-left: 0.2em 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dropdown .option-name {
+    font-weight: 700;
+}
+.popupWrapper .divGroup {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    position: relative;
+}
+.popupWrapper .expand {
+    box-sizing: border-box;
+    border-right: none;
+    flex: 0 0 calc(100% - 30px);
+}
+.popupWrapper .arrowDown {
+    align-items: center;
+    box-sizing: border-box;
+    border: 1px solid #d9d9d9;
+    border-left: none;
+    display: flex;
+    font: normal normal normal 14px/1 'FontAwesome';
+    font-size: 1.33em;
+    height: 100%;
+    justify-content: center;
+    right: 0;
+    position: absolute;
+    text-rendering: auto;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    top: 0;
+    width: 30px;
+    z-index: 1002;
 }

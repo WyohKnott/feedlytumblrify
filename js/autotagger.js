@@ -2,6 +2,8 @@
 /*jslint multivar*/
 /*global fT */
 (function () {
+
+    //Debounce?
     var save = function () {
         var spinLabel = document.getElementById('spin'),
             saveLabel = document.getElementById('save');

@@ -5,13 +5,24 @@
 
     'use strict';
 
-    var resize = function () {
+    function setDefaultPrefs () {
+        Promise.all([fT.getPrefs('enableOriginalTags'), fT.getPrefs('enableTagsFrequency')]).then(function (prefs) {
+            if (!prefs[0].enableOriginalTag) {
+                fT.setPrefs('{enableOriginalTags: false}');
+            }
+            if (!prefs[1].enableTagFsrequency) {
+                fT.setPrefs('{enableTagsFrequency: false}');
+            }
+        });
+    }
+
+    function resize () {
         let iframe = document.getElementById('iframe');
         iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px';
         iframe.focus();
-    };
+    }
 
-    var iframeOnChange = function () {
+    function iframeOnChange () {
         let tabUrl = this.src.substring(iframe.src.lastIndexOf('/') + 1),
             currentTab = document.querySelector('.tabButton.selected'),
             tabButton = document.querySelector('[href="#' + tabUrl + '"]');
@@ -20,9 +31,9 @@
         }
         tabButton.classList.add('selected');
         setTimeout(resize, 200);
-    };
+    }
 
-    var loadTab = function () {
+    function loadTab () {
         let tabUrl = document.location.hash.slice(1);
         if (!tabUrl) {
             tabUrl = 'account.html';
@@ -32,9 +43,9 @@
             return;
         }
         document.getElementById('iframe').src = tabUrl;
-    };
+    }
 
-    var changeTab = function (event) {
+    function changeTab (event) {
         let hash = document.location.hash,
             tabUrl = (new URL(this.href)).hash;
 
@@ -44,10 +55,11 @@
             document.location.hash = tabUrl;
             loadTab();
         }
-    };
+    }
 
     document.getElementById('iframe').addEventListener('load', iframeOnChange, false);
     Array.from(document.getElementsByClassName('tabButton')).forEach((itm) => itm.addEventListener('click', changeTab, false));
+    setDefaultPrefs();
     loadTab();
 
 }());
