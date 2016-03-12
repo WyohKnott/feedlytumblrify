@@ -186,7 +186,6 @@
     text-rendering: auto;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    min-width: 1em;
 }
 .popupWrapper input[type="checkbox"]:checked + label:before {
     content: '\f046';
@@ -264,8 +263,8 @@
  }
  .dropdown li {
     align-items: center;
-    border-right: 4px solid #9da6af;
-    border-left: 4px solid #9da6af;
+    border-right: 6px solid #9da6af;
+    border-left: 6px solid #9da6af;
     border-top: 1px solid #9da6af;
     box-sizing: border-box;
     display: flex;
@@ -276,8 +275,8 @@
     text-decoration: none;
  }
  .dropdown li.focused {
-    border-right: 4px solid #529ecc;
-    border-left: 4px solid #529ecc;
+    border-right: 6px solid #529ecc;
+    border-left: 6px solid #529ecc;
  }
  .dropdown li:last-child {
     border-bottom: 1px solid #9da6af;
@@ -291,7 +290,6 @@
     text-rendering: auto;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    min-width: 1em;
 }
 .dropdown li.selected:before{
     content: '\f046';
@@ -327,6 +325,9 @@
 .popupWrapper .expand {
     box-sizing: border-box;
     border-right: none;
+    flex: 1 0 auto;
+}
+.popupWrapper input[name="tags"].expand {
     flex: 0 0 calc(100% - 30px);
 }
 .popupWrapper .arrowDown {

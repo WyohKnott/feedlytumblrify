@@ -2,7 +2,7 @@
   "name": "feedlytumblrify",
   "description": "Like and reblog from Feedly",
   "homepage": "https://github.com/wyohknott/feedlytumblrify#readme",
-  "version": "0.4.0-alpha",
+  "version": "0.5.0-alpha",
   "author": "wyohknott",
   "license": "BSD",
   "bugs": {

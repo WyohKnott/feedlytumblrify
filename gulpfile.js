@@ -1,6 +1,6 @@
 'use strict';
 
-//npm install gulp del gulp-clean-css gulp-htmlclean gulp-jshint gulp-crx-pack --save-dev
+//npm install gulp del gulp-clean-css gulp-htmlclean gulp-jshint gulp-zip --save-dev
 
 var gulp = require('gulp'),
     del = require('del'),

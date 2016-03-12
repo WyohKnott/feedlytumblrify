@@ -1,0 +1,85 @@
+#overlay {
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1023;
+}
+#overlay .wrapper {
+    background-color: #fff;
+    border-radius: 3px;
+    box-sizing: border-box;
+    margin: 1em;
+    padding: 1em;
+}
+#overlay .message {
+    box-sizing: border-box;
+    padding: 1em 0;
+}
+#overlay .buttons {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    flex: 1 0 100%;
+    justify-content: flex-end;
+}
+#overlay *:focus,
+#overlay *:active {
+    outline: 0;
+    outline-style: none;
+    outline-width: 0;
+    -moz-outline-width: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+#overlay button {
+    background: #9da6af;
+    border-color: #9da6af;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    height: 40px;
+    line-height: 20px;
+    margin: 0 0.2em;
+    min-width: 6em;
+    padding: 4px 7px 5px;
+    text-decoration: none;
+}
+#overlay button:active {
+    background-color: #929ca6;
+    border-color: #929ca6;
+    color: rgba(255, 255, 255, .8);
+}
+#overlay button:focus {
+    background-color: #97a1aa;
+    border-color: #97a1aa;
+    color: rgba(255, 255, 255, .9);
+}
+#overlay button.default {
+    background: #529ecc;
+    border-color: #529ecc;
+}
+#overlay button.default:active {
+    background-color: #4295c7;
+    border-color: #4295c7;
+    color: rgba(255, 255, 255, .8);
+}
+#overlay button.default:focus {
+    background-color: #4a9aca;
+    border-color: #4a9aca;
+    color: rgba(255, 255, 255, .9);
+}

@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-/*jslint multivar*/
+/*jslint browser: true, es6: true, multivar: true */
 /*global chrome, OAuth, URL, URLSearchParams */
 var fT = (function () {
 
@@ -27,6 +27,51 @@ var fT = (function () {
                 chrome.storage.local.set(prefs, function (response) {
                     resolve(response);
                 });
+            });
+        },
+
+        getConfirmation: function (message, buttonsArr) {
+            var overlay = document.createElement('div');
+            return new Promise(function (resolve, reject) {
+                let wrapperDiv = document.createElement('div'),
+                    messageDiv = document.createElement('div'),
+                    buttonsDiv = document.createElement('div');
+
+                overlay.setAttribute('id', 'overlay');
+                wrapperDiv.classList.add('wrapper');
+                messageDiv.classList.add('message');
+                buttonsDiv.classList.add('buttons');
+                messageDiv.innerText = message;
+
+                if (!buttonsArr.length) {
+                    buttonsArr = [{caption: 'OK', value: true, default: true}];
+                }
+
+                buttonsArr.forEach(function (button) {
+                    if (!button.hasOwnProperty('caption') || !button.hasOwnProperty('value')) {
+                        return;
+                    }
+
+                    let buttonEl = document.createElement('button');
+                    buttonEl.innerText = button.caption;
+                    if (button.default) {
+                        buttonEl.classList.add('default');
+                    }
+                    buttonEl.addEventListener('click', () => resolve(button.value), false);
+                    buttonsDiv.appendChild(buttonEl);
+                });
+
+                wrapperDiv.appendChild(messageDiv);
+                wrapperDiv.appendChild(buttonsDiv);
+                overlay.appendChild(wrapperDiv);
+                document.body.appendChild(overlay);
+                overlay.querySelector('.default').focus();
+            }).then(function (response) {
+                overlay.parentElement.removeChild(overlay);
+                return response;
+            }).catch(function (err) {
+                overlay.parentElement.removeChild(overlay);
+                console.warn('Error in confirmation function');
             });
         },
 

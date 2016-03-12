@@ -1,10 +1,11 @@
 /*jshint esversion: 6 */
-/*jslint multivar*/
+/*jslint browser: true, es6: true, multivar: true */
 /*global fT */
 (function () {
+    "use strict";
 
     //Debounce?
-    var save = function (event) {
+    function save(event) {
         var saveLabel = document.getElementById('save');
         saveLabel.style.visibility = 'visible';
         saveLabel.innerText = 'Saving…';
@@ -21,7 +22,7 @@
             saveLabel.innerText = 'Saved';
             setTimeout(() => saveLabel.style.visibility = 'hidden', 3000);
         });
-    };
+    }
 
     fT.getPrefs('autotagger').then(function (response) {
         if (response.autotagger) {

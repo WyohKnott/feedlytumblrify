@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-/*jslint multivar*/
+/*jslint browser: true, es6: true, multivar: true */
 /*global chrome, OAuth, fT, URL, URLSearchParams */
 (function () {
     "use strict";

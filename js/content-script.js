@@ -1,5 +1,5 @@
 /* jshint esversion: 6 */
-/*jslint multivar*/
+/*jslint browser: true, es6: true, multivar: true */
 /*global chrome, OAuth, fT */
 (function () {
     "use strict";
@@ -13,7 +13,11 @@
             subtree: true
         },
         observer = new MutationObserver(processPage),
-        buttonsArray = [];
+        buttonsArray = [],
+        frequentTags = {};
+
+    const MIN_FREQUENCY = 0.60,
+          MIN_REBLOG = 5;
 
     function update(status) {
         if (status.logged) {
@@ -57,7 +61,7 @@
         blogsList = [];
     }
 
-    var dropdown = (function () {
+    var Dropdown = (function () {
         function clickHandler (event) {
             let li = event.target.closest('li'),
                 currentFocus = this.dropdownContainer.querySelector('li.focused');
@@ -74,11 +78,6 @@
         }
 
         function keyHandler (event) {
-            if (event.keyCode === 27) {
-                event.stopPropagation();
-                this.close();
-                return;
-            }
             if (this.dropdownContainer.style.display === 'none' || this.dropdownContainer.style.display === '') {
                 if (event.keyCode === 40) {
                     event.stopPropagation();
@@ -87,7 +86,7 @@
             } else {
                 let currentFocus = this.dropdownContainer.querySelector('li.focused');
                 if (!currentFocus) {
-                    this.dropdownContainer.querySelector('li:first-child').addClass('focused');
+                    this.dropdownContainer.querySelector('li:first-child').classList.add('focused');
                     return;
                 }
                 if (event.keyCode === 40 || event.keyCode === 9) {
@@ -95,14 +94,14 @@
                     event.preventDefault();
                     if (nextFocus) {
                         currentFocus.classList.remove('focused');
-                        nextFocus.addClass('focused');
+                        nextFocus.classList.add('focused');
                     }
                 } else if (event.keyCode === 38 || (event.shiftKey && event.keyCode === 9)) {
                     let previousFocus = currentFocus.previousElementSibling;
                     event.preventDefault();
                     if (previousFocus) {
                         currentFocus.classList.remove('focused');
-                        previousFocus.addClass('focused');
+                        previousFocus.classList.add('focused');
                     }
                 } else if (event.keyCode === 13) {
                     event.preventDefault();
@@ -119,6 +118,9 @@
                     } else {
                         currentFocus.classList.add('selected');
                     }
+                } else if (event.keyCode === 27) {
+                    event.stopPropagation();
+                    this.close();
                 }
             }
         }
@@ -132,7 +134,7 @@
                 parentEl = this.linkedEl.parentElement,
                 nextSibling = this.linkedEl.nextElementSibling;
 
-            this.linkedEl.addEventListener('click', this.close.bind(this), false);
+            this.linkedEl.closest('.popupContainer').addEventListener('click', this.close.bind(this), false);
             tagsArrow.addEventListener('click', this.toggle.bind(this), false);
             this.linkedEl.addEventListener('keydown', keyHandler.bind(this), false);
             this.dropdownContainer.addEventListener('click', clickHandler.bind(this), false);
@@ -154,7 +156,7 @@
                 optionName.classList.add('option-name');
                 optionValue.classList.add('option-value');
 
-                if (itm.type === 'autotag') {
+                if (itm.type === 'Autotag') {
                     li.classList.add('selected');
                 }
                 li.dataset.tags = itm.value;
@@ -175,7 +177,8 @@
             return this;
         }
 
-        Dropdown.prototype.toggle = function () {
+        Dropdown.prototype.toggle = function (event) {
+            event.stopPropagation();
             if (this.dropdownContainer.style.display === 'none' || this.dropdownContainer.style.display === '') {
                 this.open();
             } else {
@@ -208,7 +211,7 @@
         return Dropdown;
     }());
 
-    var reblogPopup = (function () {
+    var ReblogPopup = (function () {
         function keyHandler (event) {
             event.stopPropagation();
             if (event.keyCode === 27) {
@@ -229,6 +232,26 @@
                 randomId.push(idChar.charAt(~~(Math.random() * idChar.length)));
             }
             return randomId.join('');
+        }
+
+        function calculateFrequency (tagObj) {
+            var frequencyArr = [];
+            let count = tagObj.count,
+                tags = tagObj.tags;
+            if (count <= MIN_REBLOG) {
+                return frequencyArr;
+            }
+            for (let tag of Object.keys(tags)) {
+                let freq = +tags[tag] / +count;
+                if (freq >= MIN_FREQUENCY) {
+                    frequencyArr.push({
+                        type: 'Tag suggestion',
+                        name: ~~(freq * 100) + '%',
+                        value: tag
+                    });
+                }
+            }
+            return frequencyArr;
         }
 
         function ReblogPopup(el, data) {
@@ -278,27 +301,29 @@
                 }
             }).bind(this));
 
-            let promiseArr = [fT.getPrefs('autotagger'), fT.getPrefs('tagbundle')];
-            fT.getPrefs('enableTagsFrequency').then(function (prefs) {
-                if (prefs.enableTagsFrequency) {
-                    promiseArr.push();
-                }
-            });
-
-            Promise.all(promiseArr).then((function (prefs) {
+            Promise.all([fT.getPrefs('autotagger'), fT.getPrefs('tagbundle'), fT.getPrefs('enableTagsFrequency')]).then((function (prefs) {
                 let optionsList = [];
                 if (prefs[0].autotagger) {
                     let autotags = prefs[0].autotagger[this.postData.type];
                     if (autotags.length) {
                         optionsList.push({
-                            type: 'autotag',
+                            type: 'Autotag',
                             name: this.postData.type,
                             value: autotags
                         });
                     }
                 }
+
+                if (prefs[2].enableTagsFrequency) {
+                    if (frequentTags.hasOwnProperty(this.postData.blog_name)) {
+                        optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.blog_name]));
+                    }
+                    if (this.postData.source_name && frequentTags.hasOwnProperty(this.postData.source_name)) {
+                        optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.source_name]));
+                    }
+                }
                 if (optionsList.length) {
-                    this.dropdown = new dropdown(tagsInput, optionsList);
+                    this.dropdown = new Dropdown(tagsInput, optionsList);
                 }
             }).bind(this));
 
@@ -430,25 +455,26 @@
         };
 
         ReblogPopup.prototype.reblog = function (state) {
-            let blog_identifier = this.popupContainer.querySelector('[name=blog_identifier]').value
+            var blog_identifier = this.popupContainer.querySelector('[name=blog_identifier]').value
                 .trim(),
                 comment = this.popupContainer.querySelector('.commentArea').innerHTML.trim().replace(
                     /\r\n|\r|\n/g, '<br />'),
                 tags = this.popupContainer.querySelector('[name=tags]').value.trim().replace(
                     /-/g, ' '),
                 attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked,
-                buttonsGroup = this.popupContainer.querySelector('.buttonsGroup');
+                buttonsGroup = this.popupContainer.querySelector('.buttonsGroup'),
+                allTags = tags;
 
             Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = true);
             if (this.dropdown) {
                 let selectedTags = Array.from(this.dropdown.dropdownContainer.querySelectorAll('li.selected'));
-                selectedTags.forEach((itm) => tags += ',' + itm.dataset.tags);
+                selectedTags.forEach((itm) => allTags += ',' + itm.dataset.tags);
             }
 
             return fT.tumblrClient.request('https://api.tumblr.com/v2/blog/' + blog_identifier + '/post/reblog', {
                     method: 'POST',
                     body: 'id=' + this.postData.id + '&reblog_key=' + this.postData.reblog_key +
-                        '&state=' + state + '&comment=' + comment + '&tags=' + tags +
+                        '&state=' + state + '&comment=' + comment + '&tags=' + allTags +
                         '&attach_reblog_tree=' + attachReblog
             }).then((function (response) {
                 let showReblogButton = this.popupContainer.parentElement.querySelector(
@@ -456,6 +482,25 @@
                 this.close();
                 showReblogButton.classList.add('reblogged');
                 return response.json();
+            }).bind(this)).then((function () {
+                return fT.getPrefs('enableTagsFrequency').then((function (prefs) {
+                    if (prefs.enableTagsFrequency) {
+                        let tagsArr = tags.split(',');
+                        if (!frequentTags.hasOwnProperty(this.postData.blog_name)) {
+                            frequentTags[this.postData.blog_name] = {};
+                        }
+                        frequentTags[this.postData.blog_name].count = frequentTags[this.postData.blog_name].hasOwnProperty('count') ? +frequentTags[this.postData.blog_name].count + 1  : 1;
+                        tagsArr.forEach((function (itm) {
+                            if (frequentTags[this.postData.blog_name].hasOwnProperty('tags')) {
+                                frequentTags[this.postData.blog_name].tags[itm] = frequentTags[this.postData.blog_name].tags[itm] ? +frequentTags[this.postData.blog_name].tags[itm] + 1  : 1;
+                            } else {
+                                frequentTags[this.postData.blog_name].tags = {};
+                                frequentTags[this.postData.blog_name].tags[itm] = 1;
+                            }
+                        }).bind(this));
+                        fT.setPrefs({frequentTags: frequentTags});
+                    }
+                }).bind(this));
             }).bind(this)).catch(function (err) {
                 console.warn('Error while reblogging post', err);
                 if (err.status === 401) {
@@ -484,7 +529,7 @@
         return ReblogPopup;
     }());
 
-    var tumblrifyButtons = (function () {
+    var TumblrifyButtons = (function () {
         function TumblrifyButtons(el, data) {
             let likeButton = document.createElement('i'),
                 showReblogButton = document.createElement('i'),
@@ -544,7 +589,7 @@
 
         TumblrifyButtons.prototype.showReblog = function (event) {
             event.stopPropagation();
-            this.popup = (this.popup instanceof reblogPopup) ? this.popup : new reblogPopup(this.buttonsContainer,
+            this.popup = (this.popup instanceof ReblogPopup) ? this.popup : new ReblogPopup(this.buttonsContainer,
                 this.postData);
             if (this.popup.popupContainer.style.display !== 'block') {
                 this.popup.popupContainer.style.display = 'block';
@@ -574,13 +619,19 @@
             return response.json();
         }).then(function (data) {
             if (data.response.posts[0]) {
-                return {
+                let postData = {
+                    blog_name: data.response.posts[0].blog_name,
                     id: data.response.posts[0].id,
                     reblog_key: data.response.posts[0].reblog_key,
                     type: data.response.posts[0].type,
                     liked: data.response.posts[0].liked,
                     tags: data.response.posts[0].tags
                 };
+                if (data.response.posts[0].trail && data.response.posts[0].trail[0] &&
+                    data.response.posts[0].trail[0].is_root_item && !data.response.posts[0].trail[0].is_current_item) {
+                    postData.souce_name = data.response.posts[0].trail[0].blog.name;
+                }
+                return postData;
             } else {
                 throw new Error({status: 404, statusTest: 'Not found'});
             }
@@ -615,7 +666,7 @@
                 } else {
                     parentEl = itm;
                 }
-                buttonsArray.push(new tumblrifyButtons(parentEl, data));
+                buttonsArray.push(new TumblrifyButtons(parentEl, data));
             }).catch(function (err) {
                 console.log('Error while fetching post', blogName, id, err.statusText);
                 if (err.status === 401) {
@@ -659,7 +710,7 @@
     //onpopstate doesn't seem to work
     var cleanupInterval = window.setInterval(function () {
         buttonsArray.forEach(function (el, index, arr) {
-            if (el instanceof tumblrifyButtons && el.buttonsContainer.parentElement === null) {
+            if (el instanceof TumblrifyButtons && el.buttonsContainer.parentElement === null) {
                 el.destroy();
                 el = null;
                 delete arr[index];
@@ -671,6 +722,9 @@
         if (changes.tumblrTokens && areaName === 'local') {
             fT.getStatus().then((status) => update(status));
         }
+    });
+    fT.getPrefs('frequentTags').then(function (response) {
+            frequentTags = response.hasOwnProperty('frequentTags') ? response.frequentTags : {};
     });
     fT.getStatus().then((status) => update(status));
 

@@ -68,8 +68,37 @@ body {
     text-rendering: auto;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    min-width: 1em;
 }
 #form input[type="checkbox"]:checked + label:before {
     content: '\f046';
+}
+#form button {
+    background: #9da6af;
+    border-color: #9da6af;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    height: 40px;
+    line-height: 20px;
+    margin: 0;
+    padding: 4px 7px 5px;
+    text-decoration: none;
+}
+#form button:active {
+    background-color: #929ca6;
+    border-color: #929ca6;
+    color: rgba(255, 255, 255, .8);
+}
+#form button:focus {
+    background-color: #97a1aa;
+    border-color: #97a1aa;
+    color: rgba(255, 255, 255, .9);
+}
+#form #purgeTagHistory {
+    margin-left: 1.8em;
 }
