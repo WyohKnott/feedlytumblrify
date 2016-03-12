@@ -27,4 +27,3 @@ This extension contains code from:
 
   * [MediumEditor](https://yabwe.github.io/medium-editor/) by Davi Ferreira and contributors, under MIT licensing
   * [FontAwesome](http://fontawesome.io/) by Dave Gandy, whose font is under SIL OFL 1.1 and CSS under MIT licensing.
-  * [Material Icons](http://google.github.io/material-design-icons/) by Google, under Creative Commons Attribution 4.0.
