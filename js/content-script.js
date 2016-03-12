@@ -271,7 +271,8 @@
                 publishButton = document.createElement('button'),
                 queueButton = document.createElement('button'),
                 draftButton = document.createElement('button'),
-                parentEl = el;
+                parentEl = el,
+                prefsResolve = [];
 
             this.popupContainer = document.createElement('div');
             this.postData = data;
@@ -289,7 +290,7 @@
             blogsSelect.name = 'blog_identifier';
             attachReblogCheckbox.name = 'attachReblog';
 
-            fT.getPrefs('enableOriginalTags').then((function (prefs) {
+            prefsResolve.push(fT.getPrefs('enableOriginalTags').then((function (prefs) {
                 if (prefs.enableOriginalTags) {
                     tagsInput.value =  this.postData.tags.join(',');
                     clearTagsButton.style.display = 'inline-block';
@@ -299,33 +300,37 @@
                     clearTagsButton.style.display = 'none';
                     restoreTagsButton.style.display = 'inline-block';
                 }
-            }).bind(this));
+            }).bind(this)));
 
-            Promise.all([fT.getPrefs('autotagger'), fT.getPrefs('tagbundle'), fT.getPrefs('enableTagsFrequency')]).then((function (prefs) {
-                let optionsList = [];
-                if (prefs[0].autotagger) {
-                    let autotags = prefs[0].autotagger[this.postData.type];
-                    if (autotags.length) {
-                        optionsList.push({
-                            type: 'Autotag',
-                            name: this.postData.type,
-                            value: autotags
-                        });
+            prefsResolve.push(Promise.all([
+                    fT.getPrefs('autotagger'),
+                    fT.getPrefs('tagbundle'),
+                    fT.getPrefs('enableTagsFrequency')
+                ]).then((function (prefs) {
+                    let optionsList = [];
+                    if (prefs[0].autotagger) {
+                        let autotags = prefs[0].autotagger[this.postData.type];
+                        if (autotags.length) {
+                            optionsList.push({
+                                type: 'Autotag',
+                                name: this.postData.type,
+                                value: autotags
+                            });
+                        }
                     }
-                }
 
-                if (prefs[2].enableTagsFrequency) {
-                    if (frequentTags.hasOwnProperty(this.postData.blog_name)) {
-                        optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.blog_name]));
+                    if (prefs[2].enableTagsFrequency) {
+                        if (frequentTags.hasOwnProperty(this.postData.blog_name)) {
+                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.blog_name]));
+                        }
+                        if (this.postData.source_name && frequentTags.hasOwnProperty(this.postData.source_name)) {
+                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.source_name]));
+                        }
                     }
-                    if (this.postData.source_name && frequentTags.hasOwnProperty(this.postData.source_name)) {
-                        optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.source_name]));
+                    if (optionsList.length) {
+                        this.dropdown = new Dropdown(tagsInput, optionsList);
                     }
-                }
-                if (optionsList.length) {
-                    this.dropdown = new Dropdown(tagsInput, optionsList);
-                }
-            }).bind(this));
+                }).bind(this)));
 
             blogsList.forEach(function (itm) {
                 let blogItm = document.createElement('option');
@@ -413,7 +418,8 @@
 
             this.popupContainer.appendChild(arrowDiv);
             this.popupContainer.appendChild(popupWrapper);
-            parentEl.appendChild(this.popupContainer);
+            Promise.all(prefsResolve).then(() => parentEl.appendChild(this.popupContainer))
+                .catch((e) => console.warn(e));
 
             return this;
         }
