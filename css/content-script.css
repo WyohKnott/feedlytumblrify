@@ -305,14 +305,20 @@
     justify-content: flex-start;
 }
 .dropdown .li-group > * {
-    box-sizing: border-box;
-    padding-left: 0.2em 0;
     overflow: hidden;
+    padding: 0.3em 0.6em;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 .dropdown .option-name {
     font-weight: 700;
+    margin-bottom: 0.1em;
+    padding-bottom: 0.1em;
+}
+.dropdown .option-value {
+    font-style: italic;
+    margin-top: 0.1em;
+    padding-top: 0.1em;
 }
 .popupWrapper .divGroup {
     align-items: center;

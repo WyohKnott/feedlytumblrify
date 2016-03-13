@@ -18,13 +18,14 @@
         }
 
         function BundleEditor(parentEl, data) {
-            let leftButtons = document.createElement('div'),
-                contentDiv = document.createElement('div'),
-                rightButtons = document.createElement('div'),
-                editButton = document.createElement('div'),
-                deleteButton = document.createElement('div'),
-                cancelButton = document.createElement('div'),
-                confirmButton = document.createElement('div'),
+            let form  = document.createElement('form'),
+                leftDiv = document.createElement('div'),
+                middleDiv = document.createElement('div'),
+                rightDiv = document.createElement('div'),
+                editButton = document.createElement('button'),
+                deleteButton = document.createElement('button'),
+                cancelButton = document.createElement('button'),
+                confirmButton = document.createElement('button'),
                 nameInput = document.createElement('input'),
                 valueInput = document.createElement('input');
 
@@ -44,11 +45,16 @@
             cancelButton.innerText = '\uf05e';
             confirmButton.innerText = '\uf00c';
 
+            editButton.type = 'button';
+            deleteButton.type = 'button';
+            cancelButton.type = 'button';
+            confirmButton.type = 'button';
+
             editButton.style.display = 'inline-block';
             deleteButton.style.display = 'none';
             cancelButton.style.display = 'inline-block';
             confirmButton.style.display = 'inline-block';
-            rightButtons.style.display = 'none';
+            rightDiv.style.display = 'none';
 
             nameInput.value = this.data.name;
             valueInput.value = this.data.value;
@@ -56,34 +62,45 @@
             valueInput.disabled = true;
             nameInput.maxlength = 20;
 
-            leftButtons.classList.add('leftButtons');
-            rightButtons.classList.add('rightButtons');
-            contentDiv.classList.add('content');
-            editButton.classList.add('button', 'edit');
-            deleteButton.classList.add('button', 'delete');
-            cancelButton.classList.add('button', 'cancel');
-            confirmButton.classList.add('button', 'confirm');
-            nameInput.classList.add('name');
-            valueInput.classList.add('value');
+            leftDiv.classList.add('leftDiv');
+            rightDiv.classList.add('rightDiv');
+            middleDiv.classList.add('middleDiv');
 
-            leftButtons.appendChild(editButton);
-            leftButtons.appendChild(deleteButton);
-            rightButtons.appendChild(cancelButton);
-            rightButtons.appendChild(confirmButton);
-            contentDiv.appendChild(nameInput);
-            contentDiv.appendChild(valueInput);
-            this.bundleContainer.appendChild(leftButtons);
-            this.bundleContainer.appendChild(contentDiv);
-            this.bundleContainer.appendChild(rightButtons);
+            editButton.classList.add('edit');
+            deleteButton.classList.add('delete');
+            cancelButton.classList.add('cancel');
+            confirmButton.classList.add('confirm');
+            nameInput.classList.add('nameInput');
+            valueInput.classList.add('valueInput');
+
+            editButton.name = 'edit';
+            deleteButton.name = 'delete';
+            cancelButton.name = 'cancel';
+            confirmButton.name = 'confirm';
+            nameInput.name = 'nameInput';
+            valueInput.name = 'valueInput';
+
+            leftDiv.appendChild(editButton);
+            leftDiv.appendChild(deleteButton);
+            rightDiv.appendChild(cancelButton);
+            rightDiv.appendChild(confirmButton);
+            middleDiv.appendChild(nameInput);
+            middleDiv.appendChild(valueInput);
+            form.appendChild(leftDiv);
+            form.appendChild(middleDiv);
+            form.appendChild(rightDiv);
+            this.bundleContainer.appendChild(form);
 
             if (this.blankMode) {
-                let newBundle = document.createElement('div');
+                let newBundle = document.createElement('button');
                 newBundle.classList.add('newBundle');
                 newBundle.innerText = '\uf055';
+                newBundle.type = 'button';
+                newBundle.name = 'newBundle';
                 newBundle.addEventListener('click', this.openEdit.bind(this), false);
                 editButton.style.display = 'none';
                 this.bundleContainer.classList.add('blank');
-                this.bundleContainer.appendChild(newBundle);
+                form.appendChild(newBundle);
             }
 
             parentEl.appendChild(this.bundleContainer);
@@ -92,21 +109,22 @@
         }
 
         BundleEditor.prototype.openEdit = function () {
-            let editButton = this.bundleContainer.querySelector('.edit'),
-                deleteButton = this.bundleContainer.querySelector('.delete'),
-                rightButtons = this.bundleContainer.querySelector('.rightButtons'),
-                nameInput = this.bundleContainer.querySelector('.name'),
-                valueInput = this.bundleContainer.querySelector('.value');
+            let form = this.bundleContainer.getElementsByTagName('form')[0],
+                editButton = form.elements.edit,
+                deleteButton = form.elements.delete,
+                rightDiv = this.bundleContainer.getElementsByClassName('rightDiv')[0],
+                nameInput = form.elements.nameInput,
+                valueInput = form.elements.valueInput;
 
             if (this.blankMode) {
-                let newBundle = this.bundleContainer.querySelector('.newBundle');
+                let newBundle = form.elements.newBundle;
                 deleteButton.style.visibility = 'hidden';
                 newBundle.style.display = 'none';
             }
 
             editButton.style.display = 'none';
             deleteButton.style.display = 'inline-block';
-            rightButtons.style.display = 'flex';
+            rightDiv.style.display = 'flex';
             nameInput.disabled = false;
             valueInput.disabled = false;
             nameInput.placeholder = 'Enter a name for this bundle';
@@ -116,21 +134,22 @@
         };
 
         BundleEditor.prototype.closeEdit = function () {
-            let editButton = this.bundleContainer.querySelector('.edit'),
-                deleteButton = this.bundleContainer.querySelector('.delete'),
-                rightButtons = this.bundleContainer.querySelector('.rightButtons'),
-                nameInput = this.bundleContainer.querySelector('.name'),
-                valueInput = this.bundleContainer.querySelector('.value');
+            let form = this.bundleContainer.getElementsByTagName('form')[0],
+                editButton = form.elements.edit,
+                deleteButton = form.elements.delete,
+                rightDiv = this.bundleContainer.getElementsByClassName('rightDiv')[0],
+                nameInput = form.elements.nameInput,
+                valueInput = form.elements.valueInput;
 
             if (this.blankMode) {
-                let newBundle = this.bundleContainer.querySelector('.newBundle');
+                let newBundle = form.elements.newBundle;
                 deleteButton.style.visibility = 'visible';
                 newBundle.style.display = 'flex';
             }
 
             editButton.style.display = 'inline-block';
             deleteButton.style.display = 'none';
-            rightButtons.style.display = 'none';
+            rightDiv.style.display = 'none';
             nameInput.disabled = true;
             valueInput.disabled = true;
             nameInput.placeholder = '';
@@ -142,8 +161,9 @@
 
         BundleEditor.prototype.save = function () {
             let saveLabel = document.getElementById('save'),
-                nameInput = this.bundleContainer.querySelector('.name'),
-                valueInput = this.bundleContainer.querySelector('.value'),
+                form = this.bundleContainer.getElementsByTagName('form')[0],
+                nameInput = form.elements.nameInput,
+                valueInput = form.elements.valueInput,
                 itmIndex = tagbundle.findIndex((function (itm) {
                     return itm.name === this.data.name && itm.value === this.data.value;
                 }).bind(this));
@@ -152,25 +172,25 @@
                 return;
             }
 
-            saveLabel.style.visibility = 'visible';
             saveLabel.innerText = 'Saving…';
+            saveLabel.style.visibility = 'visible';
             if (itmIndex > -1) {
                 this.data = {
-                    name: nameInput.value,
-                    value: valueInput.value
+                    name: nameInput.value.trim(),
+                    value: valueInput.value.trim()
                 };
                 tagbundle[itmIndex] = this.data;
             } else {
                 tagbundle.push({
-                    name: nameInput.value,
-                    value: valueInput.value
+                    name: nameInput.value.trim(),
+                    value: valueInput.value.trim()
                 });
             }
             tagbundle.sort(function (a, b) {
-                if (a.name > b.name) {
+                if (a.name.toLowerCase() > b.name.toLowerCase()) {
                     return 1;
                 }
-                if (a.name < b.name) {
+                if (a.name.toLowerCase() < b.name.toLowerCase()) {
                     return -1;
                 }
                 return 0;
@@ -185,7 +205,8 @@
 
         BundleEditor.prototype.delete = function () {
             let saveLabel = document.getElementById('save'),
-                nameInput = this.bundleContainer.querySelector('.name'),
+                form = this.bundleContainer.getElementsByTagName('form')[0],
+                nameInput = form.elements.nameInput,
                 itmIndex = tagbundle.findIndex((function (itm) {
                     return itm.name === this.data.name && itm.value === this.data.value;
                 }).bind(this));
@@ -225,7 +246,7 @@
     }());
 
     function startup() {
-        let formDiv = document.getElementById('form');
+        let middleDiv = document.getElementById('content');
         bundleArray.forEach(function (el) {
             if (el instanceof BundleEditor) {
                 el.destroy();
@@ -233,11 +254,11 @@
             }
         });
         bundleArray = [];
-        bundleArray.push(new BundleEditor(formDiv));
+        bundleArray.push(new BundleEditor(middleDiv));
         fT.getPrefs('tagbundle').then(function (response) {
             tagbundle = response.tagbundle || [];
             if (tagbundle.length) {
-                tagbundle.forEach((itm) => bundleArray.push(new BundleEditor(formDiv, itm)));
+                tagbundle.forEach((itm) => bundleArray.push(new BundleEditor(middleDiv, itm)));
             }
         });
     }

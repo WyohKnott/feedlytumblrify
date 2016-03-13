@@ -7,17 +7,17 @@
 
   <link rel='stylesheet' type='text/css' href='css/font-awesome.css'>
   <link rel='stylesheet' type='text/css' href='css/behaviour.css'>
-  <link rel='stylesheet' type='text/css' href='css/confirmation.css'>
+  <link rel='stylesheet' type='text/css' href='css/common.css'>
 </head>
 <body>
-  <div id='wrapper'>
+  <form id='wrapper'>
     <div id='save'></div>
-    <ul id="form">
+    <ul id="content">
       <li><input id='enableOriginalTags' type='checkbox' name='enableOriginalTags'><label for='enableOriginalTags'>Automatically add original tags</label></li>
       <li><input id='enableTagsFrequency' type='checkbox'  name='enableTagsFrequency'><label for='enableTagsFrequency'>Enable tags suggestion</label></li>
-      <li><button type='button' id='purgeTagHistory'>Delete tag history</button></li>
+      <li><button id='purgeTagHistory' type='button' name='purgeTagHistory'>Delete tag history</button></li>
     </ul>
-  </div>
+  </form>
 
   <script src='js/common.js'></script>
   <script src='js/behaviour.js'></script>

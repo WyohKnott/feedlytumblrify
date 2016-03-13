@@ -30,7 +30,7 @@ var fT = (function () {
             });
         },
 
-        getConfirmation: function (message, buttonsArr) {
+        dialog: function (message, buttonsArr) {
             var overlay = document.createElement('div');
             return new Promise(function (resolve, reject) {
                 let wrapperDiv = document.createElement('div'),
@@ -43,7 +43,7 @@ var fT = (function () {
                 buttonsDiv.classList.add('buttons');
                 messageDiv.innerText = message;
 
-                if (!buttonsArr.length) {
+                if (!buttonsArr || !buttonsArr.length) {
                     buttonsArr = [{caption: 'OK', value: true, default: true}];
                 }
 
@@ -53,6 +53,7 @@ var fT = (function () {
                     }
 
                     let buttonEl = document.createElement('button');
+                    buttonEl.type = 'button';
                     buttonEl.innerText = button.caption;
                     if (button.default) {
                         buttonEl.classList.add('default');
@@ -71,7 +72,7 @@ var fT = (function () {
                 return response;
             }).catch(function (err) {
                 overlay.parentElement.removeChild(overlay);
-                console.warn('Error in confirmation function');
+                console.warn('Error in confirmation function', err);
             });
         },
 
@@ -99,13 +100,25 @@ var fT = (function () {
                             accessTokenSecret: config.accessTokenSecret
                         };
                     }).catch(function (err) {
-                        console.info('Outdated tokens', err.statusText);
-                        fT.logout();
-                        return {
-                            logged: false,
-                            consumerKey: config.consumerKey,
-                            consumerSecret: config.consumerSecret
-                        };
+                        if (err.status === 401 || err.status === 403) {
+                            console.info('Outdated tokens', err.statusText);
+                            fT.logout();
+                            return {
+                                logged: false,
+                                consumerKey: config.consumerKey,
+                                consumerSecret: config.consumerSecret
+                            };
+                        } else {
+                            // network probably unreachable
+                            // we keep the tokens for future use.
+                            return {
+                                logged: false,
+                                consumerKey: config.consumerKey,
+                                consumerSecret: config.consumerSecret,
+                                accessTokenKey: config.accessTokenKey,
+                                accessTokenSecret: config.accessTokenSecret
+                            };
+                        }
                     });
                 } else if (config.consumerKey && config.consumerSecret) {
                     return {
@@ -124,15 +137,9 @@ var fT = (function () {
         },
 
         logout: function () {
-            var currentPrefs = {
-                consumerKey: '',
-                consumerSecret: '',
-                accessTokenKey: '',
-                accessTokenSecret: ''
-            };
             fT.tumblrClient = {};
             return fT.getPrefs('tumblrTokens').then(function (response) {
-                currentPrefs = response.tumblrTokens || currentPrefs;
+                let currentPrefs = response.tumblrTokens || { consumerKey: '', consumerSecret: '' };
                 return currentPrefs;
             }).then(function (prefs) {
                 console.info('Logged out');

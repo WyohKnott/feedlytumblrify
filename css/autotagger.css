@@ -1,5 +1,5 @@
 body {
-    align-items: center;
+    align-items: stretch;
     background-color: #36465d;
     box-sizing: border-box;
     display: flex;
@@ -20,32 +20,31 @@ body {
     background-color: #fff;
     border-radius: 3px;
     box-sizing: border-box;
-    margin: 1em 0 10px;
-    padding: 14px;
-    width: 348px;
+    margin: 1.2em 1em 0.6em;
+    padding: 1.33em;
 }
 #save {
     align-items: center;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
+    font-size: 14px;
     font-style: italic;
     justify-content: flex-end;
     margin-left: 0.6em;
     min-height: 20px;
     visibility: hidden;
 }
-#form {
+#content {
     align-items: stretch;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     list-style: none;
     margin: 0.2em auto 0;
-    min-width: 320px;
     padding: 0;
 }
-#form li {
+#content li {
     align-items: center;
     box-sizing: border-box;
     display: flex;
@@ -53,19 +52,19 @@ body {
     justify-content: space-between;
     margin: 6px 0;
 }
-#form label {
+#content label {
     font-size: 14px;
     font-weight: 700;
     line-height: 1.2;
 }
-#form input {
+#content input {
     background: transparent;
     border: 1px solid #d9d9d9;
     border-radius: 2px;
     box-sizing: border-box;
     color: #444;
     display: block;
-    flex: 0 0 240px;
+    flex: 0 0 250px;
     font-size: 14px;
     font-weight: 400;
     margin: 0;

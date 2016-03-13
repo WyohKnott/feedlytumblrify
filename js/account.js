@@ -4,13 +4,9 @@
 (function () {
     "use strict";
 
-    var loginButton = document.getElementById('login'),
-        logoutButton = document.getElementById('logout'),
-        consumerKeyInput = document.getElementById('consumerKey'),
-        consumerSecretInput = document.getElementById('consumerSecret'),
-        statusText = document.getElementById('status'),
-        accountText = document.getElementById('account'),
-        avatar = document.getElementById('statusWrap'),
+    var form = document.forms[0],
+        loginButton = form.elements.login,
+        logoutButton = form.elements.logout,
         callbackRegex = new RegExp('^https:\/\/localhost\/redirectpage.*$', 'i');
 
     function setDefaultPrefs () {
@@ -27,13 +23,16 @@
     // Oauth connection logic
     // Step 1
     function login () {
+        let consumerKeyInput = form.elements.consumerKey,
+            consumerSecretInput = form.elements.consumerSecret;
+
         var config = {},
             tokens = {
                 consumerKey: consumerKeyInput.value,
                 consumerSecret: consumerSecretInput.value
             };
         if (!tokens.consumerKey || !tokens.consumerSecret) {
-            console.log('Missing consumerKey and consumerSecret');
+            fT.dialog('You need to enter the OAuth consumer key and consumer secret given by Tumblr.');
             return;
         }
         config = Object.assign(tokens, fT.tumblrEndpoints);
@@ -109,6 +108,12 @@
     }
 
     function update (status) {
+        let consumerKeyInput = form.elements.consumerKey,
+            consumerSecretInput = form.elements.consumerSecret,
+            statusText = document.getElementById('status'),
+            accountText = document.getElementById('account'),
+            avatar = document.getElementById('statusWrap');
+
         if (status.logged) {
             consumerKeyInput.value = status.consumerKey;
             consumerKeyInput.disabled = true;

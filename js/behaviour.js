@@ -5,7 +5,7 @@
     "use strict";
 
     function purgeTagHistory() {
-        fT.getConfirmation('Do you want to delete your tags history? This will delete all tags suggestions.', [
+        fT.dialog('Do you want to delete your tags history? This will delete all tags suggestions.', [
             {
                 caption: 'Yes',
                 value: true
@@ -26,8 +26,8 @@
         var saveLabel = document.getElementById('save'),
             pref = {};
         pref[event.target.name] = event.target.checked;
-        saveLabel.style.visibility = 'visible';
         saveLabel.innerText = 'Saving…';
+        saveLabel.style.visibility = 'visible';
         fT.setPrefs(pref).then(function () {
             saveLabel.innerText = 'Saved';
             setTimeout(() => saveLabel.style.visibility = 'hidden', 3000);

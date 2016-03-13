@@ -5,11 +5,6 @@
 
     'use strict';
 
-    function resize() {
-        let iframe = document.getElementById('iframe');
-        iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px';
-    }
-
     function iframeOnChange(event) {
         let iframe = event.target,
             tabUrl = iframe.src.substring(iframe.src.lastIndexOf('/') + 1),
@@ -19,7 +14,6 @@
             currentTab.classList.remove('selected');
         }
         tabButton.classList.add('selected');
-        setTimeout(resize, 200);
     }
 
     function loadTab() {

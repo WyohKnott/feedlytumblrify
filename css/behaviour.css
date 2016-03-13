@@ -1,5 +1,5 @@
 body {
-    align-items: center;
+    align-items: stretch;
     background-color: #36465d;
     box-sizing: border-box;
     display: flex;
@@ -20,32 +20,31 @@ body {
     background-color: #fff;
     border-radius: 3px;
     box-sizing: border-box;
-    margin: 1em 0 10px;
-    padding: 14px;
-    width: 348px;
+    margin: 1.2em 1em 0.6em;
+    padding: 1.33em;
 }
 #save {
     align-items: center;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
+    font-size: 14px;
     font-style: italic;
     justify-content: flex-end;
     margin-left: 0.6em;
     min-height: 20px;
     visibility: hidden;
 }
-#form {
+#content {
     align-items: stretch;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     list-style: none;
     margin: 0.2em auto 0;
-    min-width: 320px;
     padding: 0;
 }
-#form li {
+#content li {
     align-items: center;
     box-sizing: border-box;
     display: flex;
@@ -53,14 +52,14 @@ body {
     justify-content: space-between;
     margin: 6px 0;
 }
-#form li > input[type="checkbox"] {
+#content li > input[type="checkbox"] {
     display:none;
 }
-#form input[type="checkbox"] + label {
+#content input[type="checkbox"] + label {
     flex: 1 0 auto;
     font-size: 16px;
 }
-#form input[type="checkbox"] + label:before {
+#content input[type="checkbox"] + label:before {
     content: '\f096';
     font: normal normal normal 14px/1 'FontAwesome';
     font-size: inherit;
@@ -69,10 +68,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
-#form input[type="checkbox"]:checked + label:before {
+#content input[type="checkbox"]:checked + label:before {
     content: '\f046';
 }
-#form button {
+#content button {
     background: #9da6af;
     border-color: #9da6af;
     border-radius: 2px;
@@ -89,16 +88,16 @@ body {
     padding: 4px 7px 5px;
     text-decoration: none;
 }
-#form button:active {
+#content button:active {
     background-color: #929ca6;
     border-color: #929ca6;
     color: rgba(255, 255, 255, .8);
 }
-#form button:focus {
+#content button:focus {
     background-color: #97a1aa;
     border-color: #97a1aa;
     color: rgba(255, 255, 255, .9);
 }
-#form #purgeTagHistory {
+#purgeTagHistory {
     margin-left: 1.8em;
 }

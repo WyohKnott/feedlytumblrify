@@ -64,7 +64,7 @@
     var Dropdown = (function () {
         function clickHandler (event) {
             let li = event.target.closest('li'),
-                currentFocus = this.dropdownContainer.querySelector('li.focused');
+                currentFocus = this.dropdownContainer.getElementsByClassName('focused')[0];
             event.stopPropagation();
             if (currentFocus) {
                 currentFocus.classList.remove('focused');
@@ -78,7 +78,7 @@
         }
 
         function hoverHandler (event) {
-            let currentFocus = this.dropdownContainer.querySelector('li.focused');
+            let currentFocus = this.dropdownContainer.getElementsByClassName('focused')[0];
             let nextFocus = event.target.closest('li');
             if (currentFocus) {
                 currentFocus.classList.remove('focused');
@@ -95,9 +95,9 @@
                     this.open();
                 }
             } else {
-                let currentFocus = this.dropdownContainer.querySelector('li.focused');
+                let currentFocus = this.dropdownContainer.getElementsByClassName('focused')[0];
                 if (!currentFocus) {
-                    this.dropdownContainer.querySelector('li:first-child').classList.add('focused');
+                    this.dropdownContainer.getElementsByTagName('li')[0].classList.add('focused');
                     return;
                 }
                 if (event.keyCode === 40 || event.keyCode === 9) {
@@ -203,11 +203,11 @@
             this.dropdownContainer.style.position = 'absolute';
             this.dropdownContainer.style.top = this.linkedEl.parentElement.offsetTop + this.linkedEl.offsetTop + this.linkedEl.getBoundingClientRect().height + 'px';
             this.dropdownContainer.style.left = this.linkedEl.parentElement.offsetLeft + this.linkedEl.offsetLeft + 'px';
-            this.dropdownContainer.querySelector('li:first-child').classList.add('focused');
+            this.dropdownContainer.getElementsByTagName('li')[0].classList.add('focused');
         };
 
         Dropdown.prototype.close = function () {
-            let currentFocus = this.dropdownContainer.querySelector('li.focused');
+            let currentFocus = this.dropdownContainer.getElementsByClassName('focused')[0];
             if (currentFocus) {
                 currentFocus.classList.remove('focused');
             }
@@ -234,7 +234,7 @@
         function toggleSelect (event) {
             event.stopPropagation();
             let clickEvent = new MouseEvent('mousedown', {bubbles: true, cancelable: true, view: window});
-            this.popupContainer.querySelector('[name=blog_identifier]').dispatchEvent(clickEvent);
+            this.popupContainer.querySelector('[name="blog_identifier"]').dispatchEvent(clickEvent);
         }
 
         function uuid () {
@@ -267,7 +267,7 @@
         }
 
         function ReblogPopup(el, data) {
-            let popupWrapper = document.createElement('div'),
+            let popupWrapper = document.createElement('form'),
                 arrowDiv = document.createElement('div'),
                 tagsInput = document.createElement('input'),
                 clearTagsButton = document.createElement('button'),
@@ -301,6 +301,17 @@
             tagsInput.name = 'tags';
             blogsSelect.name = 'blog_identifier';
             attachReblogCheckbox.name = 'attachReblog';
+            publishButton.name = 'publishButton';
+            queueButton.name = 'queueButton';
+            draftButton.name = 'draftButton';
+            clearTagsButton.name = 'clearTagsButton';
+            restoreTagsButton.name = 'restoreTagsButton';
+
+            publishButton.type = 'button';
+            queueButton.type = 'button';
+            draftButton.type = 'button';
+            clearTagsButton.type = 'button';
+            restoreTagsButton.type = 'button';
 
             prefsResolve.push(fT.getPrefs('enableOriginalTags').then((function (prefs) {
                 if (prefs.enableOriginalTags) {
@@ -383,11 +394,6 @@
             this.popupContainer.classList.add('popupContainer');
             commentArea.classList.add('commentArea');
             buttonsGroup.classList.add('buttonsGroup');
-            publishButton.classList.add('publishButton');
-            queueButton.classList.add('queueButton');
-            draftButton.classList.add('draftButton');
-            clearTagsButton.classList.add('clearTagsButton');
-            restoreTagsButton.classList.add('restoreTagsButton');
             blogsSelect.classList.add('expand');
             blogsGroup.classList.add('divGroup');
             blogsArrow.classList.add('arrowDown');
@@ -447,9 +453,10 @@
         }
 
         ReblogPopup.prototype.clearTags = function () {
-            let tagsInput = this.popupContainer.querySelector('[name=tags]'),
-                clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
-                restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
+            let form = this.popupContainer.getElementsByTagName('form')[0],
+                tagsInput = form.elements.tags,
+                clearTagsButton = form.elements.clearTagsButton,
+                restoreTagsButton = form.elements.restoreTagsButton;
 
             tagsInput.value = '';
             clearTagsButton.style.display = 'none';
@@ -457,9 +464,10 @@
         };
 
         ReblogPopup.prototype.restoreTags = function () {
-            let tagsInput = this.popupContainer.querySelector('[name=tags]'),
-                clearTagsButton = this.popupContainer.querySelector('.clearTagsButton'),
-                restoreTagsButton = this.popupContainer.querySelector('.restoreTagsButton');
+            let form = this.popupContainer.getElementsByTagName('form')[0],
+                tagsInput = form.elements.tags,
+                clearTagsButton = form.elements.clearTagsButton,
+                restoreTagsButton = form.elements.restoreTagsButton;
 
             tagsInput.value = tagsInput.value.trim();
             if (tagsInput.value.length) {
@@ -483,19 +491,17 @@
         };
 
         ReblogPopup.prototype.reblog = function (state) {
-            var blog_identifier = this.popupContainer.querySelector('[name=blog_identifier]').value
-                .trim(),
-                comment = this.popupContainer.querySelector('.commentArea').innerHTML.trim().replace(
-                    /\r\n|\r|\n/g, '<br />'),
-                tags = this.popupContainer.querySelector('[name=tags]').value.trim().replace(
-                    /-/g, ' '),
-                attachReblog = !this.popupContainer.querySelector('[name=attachReblog]').checked,
-                buttonsGroup = this.popupContainer.querySelector('.buttonsGroup'),
+            var form = this.popupContainer.getElementsByTagName('form')[0],
+                blog_identifier = form.elements.blog_identifier.value.trim(),
+                comment = this.editor.elements[0].innerHTML.trim().replace(/\r\n|\r|\n/g, '<br />'),
+                tags = form.elements.tags.value.trim().replace(/-/g, ' '),
+                attachReblog = !form.elements.attachReblog.checked,
+                buttonsGroup = this.popupContainer.getElementsByClassName('buttonsGroup')[0],
                 allTags = tags;
 
             Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = true);
             if (this.dropdown) {
-                let selectedTags = Array.from(this.dropdown.dropdownContainer.querySelectorAll('li.selected'));
+                let selectedTags = Array.from(this.dropdown.dropdownContainer.getElementsByClassName('selected'));
                 selectedTags.forEach((itm) => allTags += ',' + itm.dataset.tags);
             }
 
@@ -505,8 +511,7 @@
                         '&state=' + state + '&comment=' + comment + '&tags=' + allTags +
                         '&attach_reblog_tree=' + attachReblog
             }).then((function (response) {
-                let showReblogButton = this.popupContainer.parentElement.querySelector(
-                    '.fa-retweet');
+                let showReblogButton = this.popupContainer.parentElement.querySelector('.fa-retweet');
                 this.close();
                 showReblogButton.classList.add('reblogged');
                 return response.json();
@@ -632,7 +637,7 @@
                 this.postData);
             if (this.popup.popupContainer.style.display !== 'block') {
                 this.popup.popupContainer.style.display = 'block';
-                let buttonsGroup = this.popup.popupContainer.querySelector('.buttonsGroup');
+                let buttonsGroup = this.popup.popupContainer.getElementsByClassName('buttonsGroup')[0];
                 Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
             } else {
                 this.popup.close();
@@ -685,7 +690,7 @@
                 '.u4Entry:not(.tumblrify), .u5Entry:not(.tumblrify), .u100Entry:not(.tumblrify), .u100Frame:not(.tumblrify)'
             )),
             filteredNodes = nodes.filter(function (itm) {
-                if (itm.querySelectorAll('.buttonsContainer').length) { return false;}
+                if (itm.getElementsByClassName('buttonsContainer').length) { return false;}
                 let link = itm.getAttribute('data-alternate-link');
                 return blogpostRegex.test(link);
             });
@@ -701,7 +706,7 @@
             getPost(blogName, id).then(function (data) {
                 let parentEl = '';
                 if (itm.classList.contains('u100Entry') || itm.classList.contains('u100Frame')) {
-                    parentEl = itm.querySelector('.headerInfo.headerInfo-article');
+                    parentEl = itm.getElementsByClassName('headerInfo headerInfo-article')[0];
                 } else {
                     parentEl = itm;
                 }
@@ -717,12 +722,12 @@
          *  Below is to handle moving the buttons in the sliding header while in sidebar view
          *  To put it back, we need to detect when the sliding header is destroyed with MutationRecord.removedNodes
          */
-        if (document.querySelector('.u100Entry.tumblrify')) {
+        if (document.getElementsByClassName('u100Entry tumblrify')[0]) {
             var removedHeader = '';
             let slidingHeader = document.querySelector('.headerInfo.sliderContainer:not(.moved)');
             if (slidingHeader) {
-                let headerContent = slidingHeader.querySelector('.sliderWidth.sliderCenter'),
-                    buttonsContainer = slidingHeader.closest('.slideEntryContent').querySelector('.buttonsContainer');
+                let headerContent = slidingHeader.getElementsByClassName('sliderWidth sliderCenter'),
+                    buttonsContainer = slidingHeader.closest('.slideEntryContent').getElementsByClassName('buttonsContainer')[0];
                 if (headerContent && buttonsContainer) {
                     buttonsContainer.classList.add('moved');
                     slidingHeader.classList.add('moved');
@@ -733,13 +738,13 @@
                 if (records.removedNodes.length) {
                     removedHeader = Array.from(records.removedNodes).filter(function (itm) {
                         if (itm.nodeType !== 1) { return false; }
-                        return (itm.querySelector('.buttonsContainer.moved') && itm.parentElement === null);
+                        return (itm.getElementsByClassName('buttonsContainer moved')[0] && itm.parentElement === null);
                     });
                 }
             }
             if (removedHeader.length) {
                 let parentEl = document.querySelector('.u100Entry.tumblrify .headerInfo.headerInfo-article'),
-                    buttonsContainer = removedHeader[0].querySelector('.buttonsContainer.moved');
+                    buttonsContainer = removedHeader[0].getElementsByClassName('buttonsContainer moved')[0];
                 buttonsContainer.classList.remove('moved');
                 parentEl.appendChild(buttonsContainer);
             }
