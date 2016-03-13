@@ -54,7 +54,6 @@
         buttonsArray.forEach(function (el) {
             if (el instanceof TumblrifyButtons) {
                 el.destroy();
-                el = null;
             }
         });
         buttonsArray = [];
@@ -266,7 +265,7 @@
             return frequencyArr;
         }
 
-        function ReblogPopup(el, data) {
+        function ReblogPopup(parentEl, data) {
             let popupWrapper = document.createElement('form'),
                 arrowDiv = document.createElement('div'),
                 tagsInput = document.createElement('input'),
@@ -283,7 +282,6 @@
                 publishButton = document.createElement('button'),
                 queueButton = document.createElement('button'),
                 draftButton = document.createElement('button'),
-                parentEl = el,
                 prefsResolve = [];
 
             this.popupContainer = document.createElement('div');
@@ -342,6 +340,15 @@
                         }
                     }
 
+                    if (prefs[2].enableTagsFrequency) {
+                        if (frequentTags.hasOwnProperty(this.postData.blog_name)) {
+                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.blog_name]));
+                        }
+                        if (this.postData.source_name && frequentTags.hasOwnProperty(this.postData.source_name)) {
+                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.source_name]));
+                        }
+                    }
+
                     if (prefs[1].tagbundle && prefs[1].tagbundle.length) {
                         prefs[1].tagbundle.forEach(function (itm){
                             optionsList.push({
@@ -352,14 +359,6 @@
                         });
                     }
 
-                    if (prefs[2].enableTagsFrequency) {
-                        if (frequentTags.hasOwnProperty(this.postData.blog_name)) {
-                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.blog_name]));
-                        }
-                        if (this.postData.source_name && frequentTags.hasOwnProperty(this.postData.source_name)) {
-                            optionsList = optionsList.concat(calculateFrequency(frequentTags[this.postData.source_name]));
-                        }
-                    }
                     if (optionsList.length) {
                         this.dropdown = new Dropdown(tagsInput, optionsList);
                     }
@@ -373,7 +372,6 @@
             });
 
             blogsArrow.innerText = '\uf0d7';
-
             publishButton.innerText = '\uf079';
             queueButton.innerText = '\uf017';
             draftButton.innerText = '\uf044';
@@ -493,7 +491,7 @@
         ReblogPopup.prototype.reblog = function (state) {
             var form = this.popupContainer.getElementsByTagName('form')[0],
                 blog_identifier = form.elements.blog_identifier.value.trim(),
-                comment = this.editor.elements[0].innerHTML.trim().replace(/\r\n|\r|\n/g, '<br />'),
+                comment = this.editor.elements[0].innerHTML.trim(),
                 tags = form.elements.tags.value.trim().replace(/-/g, ' '),
                 attachReblog = !form.elements.attachReblog.checked,
                 buttonsGroup = this.popupContainer.getElementsByClassName('buttonsGroup')[0],
@@ -511,7 +509,7 @@
                         '&state=' + state + '&comment=' + comment + '&tags=' + allTags +
                         '&attach_reblog_tree=' + attachReblog
             }).then((function (response) {
-                let showReblogButton = this.popupContainer.parentElement.querySelector('.fa-retweet');
+                let showReblogButton = this.popupContainer.parentElement.getElementsByClassName('fa-retweet')[0];
                 this.close();
                 showReblogButton.classList.add('reblogged');
                 return response.json();
@@ -570,10 +568,9 @@
     }());
 
     var TumblrifyButtons = (function () {
-        function TumblrifyButtons(el, data) {
+        function TumblrifyButtons(parentEl, data) {
             let likeButton = document.createElement('i'),
-                showReblogButton = document.createElement('i'),
-                parentEl = el;
+                showReblogButton = document.createElement('i');
 
             this.buttonsContainer = document.createElement('div');
             this.postData = data;
@@ -658,8 +655,8 @@
     }());
 
     function getPost(blogName, id) {
-        return fT.tumblrClient.request('https://api.tumblr.com/v2/blog/' + blogName + '/posts?id=' + id).then(function (
-            response) {
+        return fT.tumblrClient.request('https://api.tumblr.com/v2/blog/' + blogName + '/posts?id=' + id)
+        .then(function (response) {
             return response.json();
         }).then(function (data) {
             if (data.response.posts[0]) {
