@@ -469,7 +469,7 @@
                 clearTagsButton = form.elements.clearTagsButton,
                 restoreTagsButton = form.elements.restoreTagsButton;
 
-            tagsInput.value = tagsInput.value.trim();
+            tagsInput.value = fT.tagsTrim(tagsInput.value);
             if (tagsInput.value.length) {
                 tagsInput.value += ', ';
             }
@@ -494,7 +494,7 @@
             var form = this.popupContainer.getElementsByTagName('form')[0],
                 blog_identifier = form.elements.blog_identifier.value.trim(),
                 comment = this.editor.elements[0].innerHTML.trim(),
-                tags = form.elements.tags.value.trim().replace(/-/g, ' '),
+                tags = fT.tagsTrim(form.elements.tags.value).replace(/-/g, ' '),
                 attachReblog = !form.elements.attachReblog.checked,
                 buttonsGroup = this.popupContainer.getElementsByClassName('buttonsGroup')[0],
                 allTags = tags;
@@ -518,7 +518,7 @@
             }).bind(this)).then((function () {
                 return fT.getPrefs('enableTagsFrequency').then((function (prefs) {
                     if (prefs.enableTagsFrequency && tags.length) {
-                        let tagsArr = tags.split(',').map((itm) => itm.trim().toLowerCase());
+                        let tagsArr = tags.split(',').map((itm) => fT.tagsTrim(itm).toLowerCase());
                         if (!frequentTags.hasOwnProperty(this.postData.blog_name)) {
                             frequentTags[this.postData.blog_name] = {};
                         }
@@ -671,8 +671,9 @@
                     tags: data.response.posts[0].tags
                 };
                 if (data.response.posts[0].trail && data.response.posts[0].trail[0] &&
-                    data.response.posts[0].trail[0].is_root_item && !data.response.posts[0].trail[0].is_current_item) {
-                    postData.souce_name = data.response.posts[0].trail[0].blog.name;
+                    data.response.posts[0].trail[0].is_root_item && !data.response.posts[0].trail[0].is_current_item &&
+                    data.response.posts[0].blog_name !== data.response.posts[0].trail[0].blog.name) {
+                    postData.source_name = data.response.posts[0].trail[0].blog.name;
                 }
                 return postData;
             } else {

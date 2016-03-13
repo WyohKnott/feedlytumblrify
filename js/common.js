@@ -30,6 +30,10 @@ var fT = (function () {
             });
         },
 
+        tagsTrim: function (string) {
+            return string.replace(/^[\s\uFEFF\xA0\,]+|[\s\uFEFF\xA0\,]+$/g, '');
+        },
+
         dialog: function (message, buttonsArr) {
             var overlay = document.createElement('div');
             return new Promise(function (resolve, reject) {

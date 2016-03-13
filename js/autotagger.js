@@ -10,7 +10,7 @@
             autotags = {};
         saveLabel.innerText = 'Saving…';
         saveLabel.style.visibility = 'visible';
-        Array.from(document.getElementsByTagName('input')).forEach((itm) => autotags[itm.name] = itm.value.trim());
+        Array.from(document.getElementsByTagName('input')).forEach((itm) => autotags[itm.name] = fT.tagsTrim(itm.value));
         fT.setPrefs({autotagger: autotags}).then(function () {
             saveLabel.innerText = 'Saved';
             setTimeout(() => saveLabel.style.visibility = 'hidden', 3000);

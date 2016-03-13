@@ -167,7 +167,7 @@
                 itmIndex = tagbundle.findIndex((function (itm) {
                     return itm.name === this.data.name && itm.value === this.data.value;
                 }).bind(this));
-            if (!nameInput.value.trim().length || !valueInput.value.trim().length) {
+            if (!nameInput.value.trim().length || !fT.tagsTrim(valueInput.value).length) {
                 fT.dialog('You must provide a name and tags.');
                 return;
             }
@@ -177,13 +177,13 @@
             if (itmIndex > -1) {
                 this.data = {
                     name: nameInput.value.trim(),
-                    value: valueInput.value.trim()
+                    value: fT.tagsTrim(valueInput.value)
                 };
                 tagbundle[itmIndex] = this.data;
             } else {
                 tagbundle.push({
                     name: nameInput.value.trim(),
-                    value: valueInput.value.trim()
+                    value: fT.tagsTrim(valueInput.value)
                 });
             }
             tagbundle.sort(function (a, b) {
