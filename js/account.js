@@ -44,7 +44,7 @@
                 active: true
             });
         }).catch(function (err) {
-            console.error('OAuth: error while fetching request tokens: ', err.statusText);
+            console.error('OAuth: error while fetching request tokens: ', err.statusText || err);
             // We still save the consumerKey and secret
             fT.setPrefs({
                 tumblrTokens: {
@@ -94,7 +94,7 @@
                 }
             });
         }).catch(function (err) {
-            console.error('OAuth: error while fetching access tokens: ', err.statusText);
+            console.error('OAuth: error while fetching access tokens: ', err.statusText || err);
             fT.tumblrClient.setVerifier('');
             fT.setPrefs({
                 tumblrTokens: {

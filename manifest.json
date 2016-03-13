@@ -3,7 +3,7 @@
   "description": "Like and reblog from Feedly",
   "manifest_version": 2,
   "name": "FeedlyTumblrify",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "homepage_url": "https://github.com/WyohKnott/feedlytumblrify/",
   "author": "Wyoh",
 
@@ -22,7 +22,8 @@
         "css/font-awesome.css",
         "css/medium-editor.css",
         "css/flatblue.css",
-        "css/content-script.css"
+        "css/content-script.css",
+        "css/common.css"
       ],
       "js": [
         "lib/OAuth.js",

@@ -101,7 +101,7 @@ var fT = (function () {
                         };
                     }).catch(function (err) {
                         if (err.status === 401 || err.status === 403) {
-                            console.info('Outdated tokens', err.statusText);
+                            console.info('Outdated tokens', err.statusText || err);
                             fT.logout();
                             return {
                                 logged: false,
@@ -111,13 +111,29 @@ var fT = (function () {
                         } else {
                             // network probably unreachable
                             // we keep the tokens for future use.
-                            return {
-                                logged: false,
-                                consumerKey: config.consumerKey,
-                                consumerSecret: config.consumerSecret,
-                                accessTokenKey: config.accessTokenKey,
-                                accessTokenSecret: config.accessTokenSecret
-                            };
+                            return fT.dialog('Tumblr seems unreachable. Please check your Internet connection.\n Do you want to retry login in?',  [
+                                {
+                                    caption: 'Cancel',
+                                    value: false
+                                },
+                                {
+                                    caption: 'Retry',
+                                    value: true,
+                                    default: true
+                                }
+                            ]).then(function (response) {
+                                if (response) {
+                                    return fT.getStatus();
+                                } else {
+                                    return {
+                                        logged: false,
+                                        consumerKey: config.consumerKey,
+                                        consumerSecret: config.consumerSecret,
+                                        accessTokenKey: config.accessTokenKey,
+                                        accessTokenSecret: config.accessTokenSecret
+                                    };
+                                }
+                            });
                         }
                     });
                 } else if (config.consumerKey && config.consumerSecret) {

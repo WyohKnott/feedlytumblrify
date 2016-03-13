@@ -42,7 +42,7 @@
             observer.observe(document, obsConfig);
             processPage();
         }).catch(function (err) {
-            console.warn('Error while connecting to Tumblr', err);
+            console.warn('Error while connecting to Tumblr', err.statusText || err);
             if (err.status === 401) {
                 fT.getStatus().then((status) => update(status));
             }
@@ -534,13 +534,13 @@
                 }).bind(this));
             }).bind(this)).catch((function (err) {
                 this.close();
-                console.log('Error while reblogging post', err);
+                console.log('Error while reblogging post', err.statusText || err);
                 if (err.status === 401) {
                     fT.getStatus().then((status) => update(status));
                 } else if (err.status === 403) {
-                    console.log('You are probably blocked by this blog\'s author');
+                    console.log('You are probably blocked by this blog\'s author.');
                 } else if (err.status === 404) {
-                    console.log('This post has been deleted');
+                    console.log('This post has been deleted or is private.');
                 } else {
                     Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
                 }
@@ -617,13 +617,13 @@
                 }).bind(this));
             }
             return res.catch(function (err) {
-                console.log('Error while liking post', err);
+                console.log('Error while liking post', err.statusText || err);
                 if (err.status === 401) {
                     fT.getStatus().then((status) => update(status));
                 } else if (err.status === 403) {
-                    console.log('You are probably blocked by this blog\'s author');
+                    console.log('You are probably blocked by this blog\'s author.');
                 } else if (err.status === 404) {
-                    console.log('This post has been deleted');
+                    console.log('This post has been deleted or is private.');
                 }
             });
         };
@@ -709,7 +709,7 @@
                 }
                 buttonsArray.push(new TumblrifyButtons(parentEl, data));
             }).catch(function (err) {
-                console.log('Error while fetching post', blogName, id, err.statusText);
+                console.log('Error while fetching post', blogName, id, err.statusText || err);
                 if (err.status === 401) {
                     fT.getStatus().then((status) => update(status));
                 }
