@@ -77,6 +77,17 @@
             }
         }
 
+        function hoverHandler (event) {
+            let currentFocus = this.dropdownContainer.querySelector('li.focused');
+            let nextFocus = event.target.closest('li');
+            if (currentFocus) {
+                currentFocus.classList.remove('focused');
+            }
+            if (nextFocus) {
+                nextFocus.classList.add('focused');
+            }
+        }
+
         function keyHandler (event) {
             if (this.dropdownContainer.style.display === 'none' || this.dropdownContainer.style.display === '') {
                 if (event.keyCode === 40) {
@@ -138,6 +149,7 @@
             tagsArrow.addEventListener('click', this.toggle.bind(this), false);
             this.linkedEl.addEventListener('keydown', keyHandler.bind(this), false);
             this.dropdownContainer.addEventListener('click', clickHandler.bind(this), false);
+            this.dropdownContainer.addEventListener('mouseover', hoverHandler.bind(this), false);
 
             this.dropdownContainer.classList.add('dropdown');
             this.linkedEl.classList.add('expand');
@@ -227,10 +239,10 @@
 
         function uuid () {
             let idChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-                randomId = [];
-            for (let i=0; i < 5; i++) {
-                randomId.push(idChar.charAt(~~(Math.random() * idChar.length)));
-            }
+                randomId = Array(5).fill(0);
+            randomId.forEach((k, i) => {
+                randomId[i] = idChar.charAt(~~(Math.random() * idChar.length));
+            });
             return randomId.join('');
         }
 
@@ -317,6 +329,16 @@
                                 value: autotags
                             });
                         }
+                    }
+
+                    if (prefs[1].tagbundle && prefs[1].tagbundle.length) {
+                        prefs[1].tagbundle.forEach(function (itm){
+                            optionsList.push({
+                                type: 'Bundle',
+                                name: itm.name,
+                                value: itm.value
+                            });
+                        });
                     }
 
                     if (prefs[2].enableTagsFrequency) {
@@ -490,8 +512,8 @@
                 return response.json();
             }).bind(this)).then((function () {
                 return fT.getPrefs('enableTagsFrequency').then((function (prefs) {
-                    if (prefs.enableTagsFrequency) {
-                        let tagsArr = tags.split(',');
+                    if (prefs.enableTagsFrequency && tags.length) {
+                        let tagsArr = tags.split(',').map((itm) => itm.trim().toLowerCase());
                         if (!frequentTags.hasOwnProperty(this.postData.blog_name)) {
                             frequentTags[this.postData.blog_name] = {};
                         }
@@ -507,12 +529,19 @@
                         fT.setPrefs({frequentTags: frequentTags});
                     }
                 }).bind(this));
-            }).bind(this)).catch(function (err) {
-                console.warn('Error while reblogging post', err);
+            }).bind(this)).catch((function (err) {
+                this.close();
+                console.log('Error while reblogging post', err);
                 if (err.status === 401) {
                     fT.getStatus().then((status) => update(status));
+                } else if (err.status === 403) {
+                    console.log('You are probably blocked by this blog\'s author');
+                } else if (err.status === 404) {
+                    console.log('This post has been deleted');
+                } else {
+                    Array.from(buttonsGroup.children).forEach((itm) => itm.disabled = false);
                 }
-            });
+            }).bind(this));
         };
 
         ReblogPopup.prototype.close = function () {
@@ -586,9 +615,13 @@
                 }).bind(this));
             }
             return res.catch(function (err) {
-                console.warn('Error while liking post', err);
+                console.log('Error while liking post', err);
                 if (err.status === 401) {
                     fT.getStatus().then((status) => update(status));
+                } else if (err.status === 403) {
+                    console.log('You are probably blocked by this blog\'s author');
+                } else if (err.status === 404) {
+                    console.log('This post has been deleted');
                 }
             });
         };
