@@ -296,6 +296,8 @@
             blogsArrow.addEventListener('click', toggleSelect.bind(this), false);
             this.popupContainer.addEventListener('keydown', keyHandler.bind(this), false);
 
+            popupWrapper.autocomplete = 'off';
+
             tagsInput.name = 'tags';
             blogsSelect.name = 'blog_identifier';
             attachReblogCheckbox.name = 'attachReblog';
