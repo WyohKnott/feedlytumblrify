@@ -6,8 +6,8 @@
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('chrome-extension://__MSG_@@extension_id__/assets/fontawesome-webfont.woff2') format('woff2'),
-       url('../assets/fontawesome-webfont.woff2') format('woff2');
+  src: url('../assets/fontawesome-webfont.woff2') format('woff2'),
+       url('chrome-extension://__MSG_@@extension_id__/assets/fontawesome-webfont.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }

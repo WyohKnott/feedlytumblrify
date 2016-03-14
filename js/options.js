@@ -16,9 +16,8 @@
         tabButton.classList.add('selected');
     }
 
-    function loadTab() {
-        let tabUrl = document.location.hash.slice(1),
-            iframe = document.getElementById('iframe');
+    function loadTab(tabUrl) {
+        let iframe = document.getElementById('iframe');
         if (!tabUrl) {
             tabUrl = 'account.html';
         }
@@ -31,14 +30,13 @@
     }
 
     function changeTab(event) {
-        let hash = document.location.hash,
-            tabUrl = (new URL(event.target.href)).hash;
+        let hash = iframe.src.substring(iframe.src.lastIndexOf('/') + 1),
+            tabUrl = (new URL(event.target.href)).hash.slice(1);
 
         event.stopPropagation();
 
         if (hash !== tabUrl) {
-            document.location.hash = tabUrl;
-            loadTab();
+            loadTab(tabUrl);
         }
     }
 
