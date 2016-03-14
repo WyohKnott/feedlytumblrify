@@ -72,7 +72,7 @@ gulp.task('chrome', ['html', 'scripts', 'styles', 'copy'], function() {
 
 gulp.task('firefox', ['html', 'scripts_fx', 'styles', 'copy_fx'], function() {
     var manifest = require('./firefox/manifest'),
-        distFileName = manifest.name + ' v' + manifest.version + '_Firefox' + '.xpi';
+        distFileName = manifest.name + ' v' + manifest.version + '.xpi';
     return gulp.src(['build/**'])
         .pipe(zip(distFileName))
         .pipe(gulp.dest('dist'));
