@@ -24,6 +24,8 @@ gulp.task('copy', function() {
 });
 
 gulp.task('copy_fx', ['copy'], function() {
+    gulp.src('firefox/lib/OAuth.js')
+        .pipe(gulp.dest('build/lib'));
     return gulp.src('firefox/manifest.json')
         .pipe(gulp.dest('build'));
 });
