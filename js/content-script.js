@@ -726,7 +726,7 @@
             var removedHeader = '';
             let slidingHeader = document.querySelector('.headerInfo.sliderContainer:not(.moved)');
             if (slidingHeader) {
-                let headerContent = slidingHeader.getElementsByClassName('sliderWidth sliderCenter'),
+                let headerContent = slidingHeader.getElementsByClassName('sliderWidth sliderCenter')[0],
                     buttonsContainer = slidingHeader.closest('.slideEntryContent').getElementsByClassName('buttonsContainer')[0];
                 if (headerContent && buttonsContainer) {
                     buttonsContainer.classList.add('moved');
