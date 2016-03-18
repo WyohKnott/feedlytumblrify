@@ -23,13 +23,6 @@ gulp.task('copy', function() {
         .pipe(gulp.dest('build'));
 });
 
-gulp.task('copy_fx', ['copy'], function() {
-    gulp.src('firefox/lib/OAuth.js')
-        .pipe(gulp.dest('build/lib'));
-    return gulp.src('firefox/manifest.json')
-        .pipe(gulp.dest('build'));
-});
-
 gulp.task('html', function() {
     return gulp.src('./*.html')
         .pipe(htmlclean())
@@ -42,19 +35,8 @@ gulp.task('jshint', function() {
         .pipe(jshint.reporter('default'));
 });
 
-gulp.task('jshint_fx', function() {
-    return gulp.src('firefox/*.js')
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'));
-});
-
 gulp.task('scripts', ['jshint'], function() {
     return gulp.src(['js/*.js'])
-        .pipe(gulp.dest('build/js'));
-});
-
-gulp.task('scripts_fx', ['scripts', 'jshint_fx'], function() {
-    return gulp.src(['firefox/*.js'])
         .pipe(gulp.dest('build/js'));
 });
 
@@ -72,8 +54,8 @@ gulp.task('chrome', ['html', 'scripts', 'styles', 'copy'], function() {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('firefox', ['html', 'scripts_fx', 'styles', 'copy_fx'], function() {
-    var manifest = require('./firefox/manifest'),
+gulp.task('firefox', ['html', 'scripts', 'styles', 'copy'], function() {
+    var manifest = require('./manifest'),
         distFileName = manifest.name + ' v' + manifest.version + '.xpi';
     return gulp.src(['build/**'])
         .pipe(zip(distFileName))
