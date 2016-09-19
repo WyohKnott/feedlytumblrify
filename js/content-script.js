@@ -705,7 +705,9 @@
             }
             getPost(blogName, id).then(function (data) {
                 let parentEl = '';
-                if (itm.classList.contains('u100Entry') || itm.classList.contains('u100Frame')) {
+                if (itm.classList.contains('u100Entry')) {
+                    parentEl = document.getElementsByClassName('sliderWidth sliderCenter')[0];
+                } else if (itm.classList.contains('u100Frame')) {
                     parentEl = itm.getElementsByClassName('headerInfo headerInfo-article')[0];
                 } else {
                     parentEl = itm;
@@ -718,37 +720,6 @@
                 }
             });
         });
-        /*
-         *  Below is to handle moving the buttons in the sliding header while in sidebar view
-         *  To put it back, we need to detect when the sliding header is destroyed with MutationRecord.removedNodes
-         */
-        if (document.getElementsByClassName('u100Entry tumblrify')[0]) {
-            var removedHeader = '';
-            let slidingHeader = document.querySelector('.headerInfo.sliderContainer:not(.moved)');
-            if (slidingHeader) {
-                let headerContent = slidingHeader.getElementsByClassName('sliderWidth sliderCenter')[0],
-                    buttonsContainer = slidingHeader.closest('.slideEntryContent').getElementsByClassName('buttonsContainer')[0];
-                if (headerContent && buttonsContainer) {
-                    buttonsContainer.classList.add('moved');
-                    slidingHeader.classList.add('moved');
-                    headerContent.appendChild(buttonsContainer);
-                }
-            }
-            for (let records of mutations) {
-                if (records.removedNodes.length) {
-                    removedHeader = Array.from(records.removedNodes).filter(function (itm) {
-                        if (itm.nodeType !== 1) { return false; }
-                        return (itm.getElementsByClassName('buttonsContainer moved')[0] && itm.parentElement === null);
-                    });
-                }
-            }
-            if (removedHeader.length) {
-                let parentEl = document.querySelector('.u100Entry.tumblrify .headerInfo.headerInfo-article'),
-                    buttonsContainer = removedHeader[0].getElementsByClassName('buttonsContainer moved')[0];
-                buttonsContainer.classList.remove('moved');
-                parentEl.appendChild(buttonsContainer);
-            }
-        }
     }
 
     //onpopstate doesn't seem to work
