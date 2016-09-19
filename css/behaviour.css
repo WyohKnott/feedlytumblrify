@@ -99,6 +99,6 @@ body {
     border-color: #97a1aa;
     color: rgba(255, 255, 255, .9);
 }
-#purgeTagHistory {
+#content #purgeTagHistory {
     margin-left: 1.8em;
 }
