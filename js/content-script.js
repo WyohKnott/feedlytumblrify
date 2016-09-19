@@ -17,7 +17,7 @@
         frequentTags = {};
 
     const MIN_FREQUENCY = 0.60,
-          MIN_REBLOG = 5;
+          MIN_REBLOG = 2;
 
     function update(status) {
         if (status.logged) {
