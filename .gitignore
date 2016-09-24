@@ -3,6 +3,7 @@
 *Thumbs.db
 .DS_Store
 
+/assets/keys.json.private
 /build
 /dist
 /node_modules

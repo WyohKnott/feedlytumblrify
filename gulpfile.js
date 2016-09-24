@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     htmlclean = require('gulp-htmlclean'),
     cleanCSS = require('gulp-clean-css'),
     jshint = require('gulp-jshint'),
+    rename = require('gulp-rename'),
     zip = require('gulp-zip');
 
 gulp.task('clean', function() {
@@ -15,7 +16,10 @@ gulp.task('clean', function() {
 
 //copy static folders to build directory
 gulp.task('copy', function() {
-    gulp.src('assets/**')
+    gulp.src(['assets/*.png', 'assets/*.woff2'])
+        .pipe(gulp.dest('build/assets'));
+    gulp.src('assets/keys.json.private')
+        .pipe(rename('keys.json'))
         .pipe(gulp.dest('build/assets'));
     gulp.src('lib/*.js')
         .pipe(gulp.dest('build/lib'));

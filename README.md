@@ -3,6 +3,11 @@
 This browser extension allows you to like and reblog Tumblr posts directly
 from Feedly.
 
+
+##How to build
+
+Add your keys to `assets/keys.json` and save the file as `assets/keys.json.private`. Then build the project with `gulp chrome` or `gulp firefox`.
+
 ##Licenses
 
 This extension contains code from:
