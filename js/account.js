@@ -57,7 +57,7 @@
                 fT.tumblrClient = {};
             });
         }).catch(function (err) {
-            console.error("Could not fetch keys from key file.")
+            console.error("Could not fetch keys from key file.");
         });
     }
 
