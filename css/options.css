@@ -11,8 +11,8 @@ body {
     margin-top: 0.2em;
     min-width: 400px;
     max-width: 400px;
-    max-height: 540px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 #tabNav {
     align-items: flex-start;

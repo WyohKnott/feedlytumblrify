@@ -3,14 +3,14 @@
   "description": "Like and reblog from Feedly",
   "manifest_version": 2,
   "name": "FeedlyTumblrify",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "homepage_url": "https://github.com/WyohKnott/feedlytumblrify/",
   "author": "Wyoh",
 
   "applications": {
     "gecko": {
       "id": "feedlytumblrify@wyyoh",
-      "strict_min_version": "51.0*"
+      "strict_min_version": "48.0*"
     }
   },
   "minimum_chrome_version": "50.0",
