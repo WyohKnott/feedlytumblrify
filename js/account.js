@@ -23,38 +23,41 @@
     // Oauth connection logic
     // Step 1
     function login () {
-        let consumerKeyInput = form.elements.consumerKey,
-            consumerSecretInput = form.elements.consumerSecret;
-
-        var config = {},
-            tokens = {
-                consumerKey: consumerKeyInput.value,
-                consumerSecret: consumerSecretInput.value
-            };
-        if (!tokens.consumerKey || !tokens.consumerSecret) {
-            fT.dialog('You need to enter the OAuth consumer key and consumer secret given by Tumblr.');
-            return;
-        }
-        config = Object.assign(tokens, fT.tumblrEndpoints);
-        fT.tumblrClient = new OAuth(config);
-        fT.tumblrClient.fetchRequestToken().then(function (url) {
-            console.info('OAuth: request tokens obtained');
-            chrome.tabs.create({
-                url: url,
-                active: true
+        fetch('assets/keys.json').then(function (response) {
+            return response.json();
+        }).then (function (keys) {
+            var config = {},
+                tokens = {
+                    consumerKey: keys.consumerKey,
+                    consumerSecret: keys.consumerSecret
+                };
+            if (!tokens.consumerKey || !tokens.consumerSecret) {
+                fT.dialog('You need a valid key file. The extension package have probably been built without it.');
+                return;
+            }
+            config = Object.assign(tokens, fT.tumblrEndpoints);
+            fT.tumblrClient = new OAuth(config);
+            fT.tumblrClient.fetchRequestToken().then(function (url) {
+                console.info('OAuth: request tokens obtained');
+                chrome.tabs.create({
+                    url: url,
+                    active: true
+                });
+            }).catch(function (err) {
+                console.error('OAuth: error while fetching request tokens: ', err.statusText || err);
+                // We still save the consumerKey and secret
+                fT.setPrefs({
+                    tumblrTokens: {
+                        consumerKey: config.consumerKey,
+                        consumerSecret: config.consumerSecret,
+                        accessTokenKey: '',
+                        accessTokenSecret: ''
+                    }
+                });
+                fT.tumblrClient = {};
             });
         }).catch(function (err) {
-            console.error('OAuth: error while fetching request tokens: ', err.statusText || err);
-            // We still save the consumerKey and secret
-            fT.setPrefs({
-                tumblrTokens: {
-                    consumerKey: config.consumerKey,
-                    consumerSecret: config.consumerSecret,
-                    accessTokenKey: '',
-                    accessTokenSecret: ''
-                }
-            });
-            fT.tumblrClient = {};
+            console.error("Could not fetch keys from key file.")
         });
     }
 
@@ -115,10 +118,6 @@
             avatar = document.getElementById('statusWrap');
 
         if (status.logged) {
-            consumerKeyInput.value = status.consumerKey;
-            consumerKeyInput.disabled = true;
-            consumerSecretInput.value = status.consumerSecret;
-            consumerSecretInput.disabled = true;
             statusText.textContent = 'logged as';
             accountText.textContent = status.account;
             avatar.style.background = 'url(https://api.tumblr.com/v2/blog/' + status.account +
@@ -128,10 +127,6 @@
             document.body.classList.remove('loggedout');
             document.body.classList.add('loggedin');
         } else {
-            consumerKeyInput.value = status.consumerKey;
-            consumerKeyInput.disabled = false;
-            consumerSecretInput.value = status.consumerSecret;
-            consumerSecretInput.disabled = false;
             statusText.textContent = 'logged out';
             accountText.textContent = '';
             avatar.style.background = 'url(assets/default_avatar_128.png) no-repeat center';
