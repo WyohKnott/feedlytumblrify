@@ -15,7 +15,7 @@
                 fT.setPrefs({enableOriginalTags: false});
             }
             if (!prefs[1].hasOwnProperty('enableTagsFrequency')) {
-                fT.setPrefs({enableTagsFrequency: false});
+                fT.setPrefs({enableTagsFrequency: true});
             }
         });
     }
