@@ -687,7 +687,7 @@
         // .u100Frame = full articles, .u100Entry = sidebar article
         // data-alternate-link
         let nodes = Array.from(document.querySelectorAll(
-                '.u4Entry:not(.tumblrify), .u5Entry:not(.tumblrify), .u100Entry:not(.tumblrify), .u100Frame:not(.tumblrify)'
+                '.u4.entry:not(.tumblrify), .u5.entry:not(.tumblrify), .u100Entry:not(.tumblrify), .u100Frame:not(.tumblrify)'
             )),
             filteredNodes = nodes.filter(function (itm) {
                 if (itm.getElementsByClassName('buttonsContainer').length) { return false;}
