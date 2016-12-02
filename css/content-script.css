@@ -1,5 +1,5 @@
-.u4Entry,
-.u5Entry {
+.u4.entry,
+.u5.entry {
     position: relative;
 }
 
@@ -12,18 +12,18 @@
     box-sizing: border-box;
     font-size: 16px;
 }
-.u4Entry .buttonsContainer {
+.u4.entry .buttonsContainer {
     position: absolute;
     top: initial;
     right: 10px;
     left: initial;
     bottom: 10px;
 }
-.u5Entry .buttonsContainer {
+.u5.entry .buttonsContainer {
     position: absolute;
-    top: 0;
-    left: initial;
-    right: 0;
+    top: 10px;
+    left: 10px;
+    right: initial;
     bottom: initial;
     text-shadow: 1px 1px 2px white,
                 -1px 1px 2px white,
@@ -62,7 +62,7 @@
     position: absolute;
     z-index: 1001;
 }
-.u4Entry .popupContainer {
+.u4.entry .popupContainer {
     right: -46px;
     left: initial;
 }
@@ -105,8 +105,8 @@
     position: absolute;
     pointer-events: none;
 }
-.u4Entry .arrow:after,
-.u4Entry .arrow:before {
+.u4.entry .arrow:after,
+.u4.entry .arrow:before {
     left: 80%;
 }
 .arrow:after {
