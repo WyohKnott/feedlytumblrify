@@ -91,7 +91,7 @@
     position: relative;
     width: 20rem;
 }
-.u4Entry .arrow {
+.u4.entry .arrow {
     align-self: flex-end;
 }
 .arrow:after,
@@ -127,10 +127,10 @@
 .popupWrapper .commentArea {
     flex: 1 0 10rem;
 }
-.popupWrapper input,
+.popupWrapper input.popupElement,
 .popupWrapper .commentArea,
-.popupWrapper select,
-.popupWrapper label {
+.popupWrapper select.popupElement,
+.popupWrapper label.popupElement {
     background: #fff;
     border: 1px solid #d9d9d9;
     border-radius: 2px;
@@ -141,15 +141,15 @@
     outline: 0;
     padding: 6px 9px;
 }
-.popupWrapper label {
+.popupWrapper label.popupElement {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
-.popupWrapper label > input {
+.popupWrapper label.popupElement > input.popupElement {
     margin-right: 0.5em;
 }
-.popupWrapper button {
+.popupWrapper button.popupElement {
     background: #9da6af;
     border-color: #9da6af;
     border-radius: 2px;
@@ -165,9 +165,17 @@
     line-height: 20px;
     margin: 1px;
     padding: 4px 7px 5px;
+    text-align: center;
     text-decoration: none;
+    text-transform: none;
+    vertical-align: initial;
+    min-width: initial;
+    letter-spacing: initial;
+    box-shadow: initial;
+    outline: initial;
+    
 }
-.popupWrapper select {
+.popupWrapper select.popupElement {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
@@ -175,10 +183,10 @@
 .popupWrapper .divGroup > input[type="checkbox"] {
     display:none;
 }
-.popupWrapper input[type="checkbox"] + label {
+.popupWrapper input[type="checkbox"] + label.popupElement {
     flex: 1 0 auto;
 }
-.popupWrapper input[type="checkbox"] + label:before {
+.popupWrapper input[type="checkbox"] + label.popupElement:before {
     content: '\f096';
     font: normal normal normal 14px/1 'FontAwesome';
     font-size: inherit;
@@ -187,10 +195,10 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
-.popupWrapper input[type="checkbox"]:checked + label:before {
+.popupWrapper input[type="checkbox"]:checked + label.popupElement:before {
     content: '\f046';
 }
-.popupWrapper select {
+.popupWrapper select.popupElement {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
@@ -203,26 +211,26 @@
     -moz-outline-width: 0;
     -webkit-tap-highlight-color: transparent;
 }
-.popupWrapper button:active {
+.popupWrapper button.popupElement:active {
     background-color: #929ca6;
     border-color: #929ca6;
     color: rgba(255, 255, 255, .8);
 }
-.popupWrapper button:focus {
+.popupWrapper button.popupElement:focus {
     background-color: #97a1aa;
     border-color: #97a1aa;
     color: rgba(255, 255, 255, .9);
 }
-.popupWrapper button.blue {
+.popupWrapper button.popupElement.blue {
     background: #529ecc;
     border-color: #529ecc;
 }
-.popupWrapper button.blue:active {
+.popupWrapper button.popupElement.blue:active {
     background-color: #4295c7;
     border-color: #4295c7;
     color: rgba(255, 255, 255, .8);
 }
-.popupWrapper button.blue:focus {
+.popupWrapper button.popupElement.blue:focus {
     background-color: #4a9aca;
     border-color: #4a9aca;
     color: rgba(255, 255, 255, .9);
@@ -233,7 +241,7 @@
     flex-direction: row;
     justify-content: space-between;
 }
-.buttonsGroup > button {
+.buttonsGroup > button.popupElement {
     flex-grow: 1;
     font: normal normal normal 14px/1 'FontAwesome';
     font-size: inherit;

@@ -388,6 +388,16 @@
             publishButton.classList.add('blue');
             queueButton.classList.add('blue');
             draftButton.classList.add('blue');
+            
+            tagsInput.classList.add('popupElement');
+            clearTagsButton.classList.add('popupElement');
+            restoreTagsButton.classList.add('popupElement');
+            attachReblogCheckbox.classList.add('popupElement');
+            attachReblogLabel.classList.add('popupElement');
+            blogsSelect.classList.add('popupElement');
+            publishButton.classList.add('popupElement');
+            queueButton.classList.add('popupElement');
+            draftButton.classList.add('popupElement');
 
             arrowDiv.classList.add('arrow');
             popupWrapper.classList.add('popupWrapper');
