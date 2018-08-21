@@ -41,6 +41,9 @@
     }
 
     document.getElementById('iframe').addEventListener('load', iframeOnChange, false);
+    window.addEventListener('popstate', function(event) {
+            event.stopPropagation();
+        }, false);
     Array.from(document.getElementsByClassName('tabButton')).forEach((itm) => itm.addEventListener('click', changeTab, false));
     loadTab();
 
