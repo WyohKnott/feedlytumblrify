@@ -3,7 +3,7 @@
   "description": "Like and reblog from Feedly",
   "manifest_version": 2,
   "name": "FeedlyTumblrify",
-  "version": "0.7.6",
+  "version": "0.8.0",
   "homepage_url": "https://github.com/WyohKnott/feedlytumblrify/",
   "author": "Wyoh",
 
